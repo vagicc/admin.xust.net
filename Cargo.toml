@@ -1,0 +1,69 @@
+[package]
+name = "admin-xust-net"
+version = "0.1.0"
+edition = "2021"
+readme = "README.md"
+authors = ["技术支持：临来笑笑生 <luck@xust.net>"]
+
+
+# www.gust.cn站点     2024.03.21   临来笑笑生
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# https://crates.io/
+# tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread","fs"] }
+warp = { version = "0.3.6", features = ["tls","multipart","websocket"] }
+
+# diesel是Rust的ORM(对象关系映射器)和查询构建器
+# diesel为PostgreSQL、Mysql及SQLite提供了开箱即用的支持
+#diesel = { version="2.1.5",features=["extras","postgres","r2d2"] }
+diesel = { version="2.1.5",features=["extras","postgres","r2d2","with-deprecated","numeric","chrono"] }
+#  diesel中的numeric类型用到 Nullable<Decimal>
+# bigdecimal = ">= 0.0.10, < 0.2.0"
+# bigdecimal = "0.3.0"
+bigdecimal = "0.4.3"
+# diesel类型:Inet=> ipnetwork  (version = ">=0.12.2, <0.21.0")
+ipnetwork = "0.20.0"
+
+
+# 模板-隔离RUST和HTML
+# 基本用法: https://handlebarsjs.com/zh/guide/expressions.html#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95
+# 文档：https://docs.rs/handlebars/4.3.6/handlebars/
+handlebars = "5.1.0" 
+
+# json
+# serde = {version = "1.0.150", features = ["derive"] }
+# serde_json = "1.0.89"
+# serde_derive = "1.0.150"
+serde = {version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.114"
+serde_derive = "1.0.197"
+
+# 时间与日期 (带features = ["serde"],时间才能使用Deserialize, Serialize的特征)
+chrono = { version="0.4.35", features = ["serde"] }
+
+# 加载环境配置文件.env
+dotenv = "0.15.0"
+lazy_static = "1.4.0"
+
+# 日志
+env_logger = "0.10.0"
+# env_logger = "0.11.3"   #这个最新的好像不行
+log = "0.4.17"
+# pretty_env_logger = "0.4.0"  #这个没有使用到了
+
+# 随机库
+rand = "0.8.5"
+
+#sha1加密,新版使用方法不同
+sha1 = "0.6.0"
+
+base64 = "0.22.0"
+
+#爬虫
+reqwest = { version="0.12.3",features=["socks","json","blocking","cookies","gzip","brotli","multipart","deflate"]}
+select = "0.6.0"
+url = "2.5.0"
+#爬虫下载相关
+tempfile = "3.10.1"

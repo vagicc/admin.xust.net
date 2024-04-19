@@ -1,0 +1,20 @@
+# 监听端口: http => 80; https => 443
+PORT = 5813
+
+# 监听IPv6或监听IPv4
+IS_IPV6 = false
+
+# https证书   
+cert_path=tls/cert.pem
+key_path=tls/key.rsa    
+# cert_path=/var/www/nginx/gust.cn_nginx/gust.cn_bundle.crt
+# key_path=/var/www/nginx/gust.cn_nginx/gust.cn.key
+
+# postgres数据库配置: DATABASE_URL=mysql://[user[:password]@]host/database_name
+DATABASE_URL=postgres://user:passwd@127.0.0.1:5432/elase
+
+# 网址
+BASE_URL=//127.0.0.1:5813/
+
+# 日志记录模式：Off,Error,Warn,Info,Debug,Trace
+RUST_LOG=Info
