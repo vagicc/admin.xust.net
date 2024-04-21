@@ -48,6 +48,7 @@ CREATE TABLE "book_chapters"(
     "visit" bigint NOT NULL DEFAULT 0,
     "previous" INTEGER DEFAULT NULL,
     "next" INTEGER DEFAULT NULL,
+    "publish" BOOLEAN DEFAULT TRUE,
     "seo_title" CHARACTER VARYING(255) DEFAULT NULL,
     "seo_keywords" CHARACTER VARYING(255) DEFAULT NULL,
     "seo_description" CHARACTER VARYING(255) DEFAULT NULL,
@@ -58,6 +59,7 @@ CREATE TABLE "book_chapters"(
 CREATE INDEX idx_book_chapters_bood_id ON book_chapters (bood_id);
 CREATE INDEX idx_book_chapters_bood_name ON book_chapters (bood_name);
 CREATE INDEX idx_book_chapters_title ON book_chapters (title);
+CREATE INDEX idx_book_chapters_publish ON book_chapters (publish);
 COMMENT ON TABLE book_chapters IS '书章节内容表';
 COMMENT ON COLUMN book_chapters.bood_id IS '书籍ID';
 COMMENT ON COLUMN book_chapters.bood_name IS '书籍名称';
@@ -67,7 +69,8 @@ COMMENT ON COLUMN book_chapters.content IS '本章内容';
 COMMENT ON COLUMN book_chapters.visit IS '阅读次数';
 COMMENT ON COLUMN book_chapters.previous IS '上一章（ID）';
 COMMENT ON COLUMN book_chapters.next IS '下一章（ID）';
-COMMENT ON COLUMN book_chapters.seo_title IS 'SEO标题';
+COMMENT ON COLUMN book_chapters.seo_title IS '是否已发布';
+COMMENT ON COLUMN book_chapters.publish IS 'SEO标题';
 COMMENT ON COLUMN book_chapters.seo_keywords IS 'SEO关键词';
 COMMENT ON COLUMN book_chapters.seo_description IS 'SEO描述';
 COMMENT ON COLUMN book_chapters.create_id IS '创建者ID';

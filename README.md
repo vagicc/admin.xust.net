@@ -11,6 +11,6 @@ cargo new admin-xust-net
 # 发布站点。
 # 把elapse.date的文章迁过来
 
-
+# 酷美网盘：https://www.kumeiwp.com/  免费音乐
 
 
