@@ -46,13 +46,13 @@ pub async fn check_all_url(
             println!("第一层URL");
             for link in links {
                 let url = link.as_str().to_string();
-                println!("{}", url);
+                // println!("{}", url);
             }
             println!("第=====二=============层URL");
-            for link in next {
-                let url = link.as_str().to_string();
-                println!("{}", url);
-            }
+            // for link in next {
+            //     let url = link.as_str().to_string();
+            //     println!("{}", url);
+            // }
         }
         Err(e) => {}
     }
@@ -60,13 +60,17 @@ pub async fn check_all_url(
     Ok(warp::reply::html(html)) //直接返回html
 }
 
-//这里是异步递归
+//异步递归取得下一层这后的所有链接
+//这里是异步递归, 这个做 /m/ 的筛选，放到 法议网的  网站地图
+//问题，做url唯一性
 async fn next_level_url(
     links: &std::collections::HashSet<url::Url>,
     depth: usize,
 ) -> std::collections::HashSet<url::Url> {
+    //HashSet 是一种集合，它的特性就是所有的元素都是唯一的，如果你尝试向 HashSet 中添加一个已经存在的元素，它不会有任何效果。因此，HashSet 已经为你保证了所有的 URL 都是唯一的，你不需要做任何更改。
+    //这个说法还没去证明
     let mut temp_links: std::collections::HashSet<url::Url> = std::collections::HashSet::new();
-    if depth > 2 {
+    if depth > 28 {
         return temp_links;
     }
     for link in links {
@@ -79,21 +83,36 @@ async fn next_level_url(
         }
         // println!("域名：{:#?}",kk);
         let url = link.as_str().to_string();
+        if !url.contains("/m/"){
+            //contains 包含的意思
+            // println!("不是移动端");
+            continue;
+        }
         // println!("{}", url);
-        println!("<li><a href=\"{}\">{0}</a></li>",url);
-        let temp_option = get_all_url(url).await;
-        if let Some(temp) = temp_option {
-            temp_links.extend(temp.clone()); //当前层
+        
+        if !temp_links.contains(&link) {
+            println!("<li><a href=\"{}\">{0}</a></li>",url);
+             
+            temp_links.insert(link.clone()); //当前层
 
-            // 异步递归
-            let future = Box::pin(next_level_url(&temp, depth + 1));
-            let result = future.await;
-            temp_links.extend(result);
+            if let Some(temp) = get_all_url(url).await {
+                temp_links.extend(temp.clone());
+
+                //取得差值，避免重复抓url
+                let difference:std::collections::HashSet<url::Url>=temp.difference(&links).cloned().collect();
+
+                // 异步递归
+                // let future = Box::pin(next_level_url(&temp, depth + 1));
+                let future = Box::pin(next_level_url(&difference, depth + 1));
+                let result = future.await;
+                temp_links.extend(result);
+            }
         }
     }
     temp_links
 }
 
+//取得当前页的所有URL
 async fn get_all_url(url: String) -> Option<std::collections::HashSet<url::Url>> {
     let mut links: std::collections::HashSet<url::Url> = std::collections::HashSet::new();
     let res = reqwest::get(&url).await;
