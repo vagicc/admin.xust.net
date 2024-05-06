@@ -249,7 +249,7 @@ pub fn role_left_menus(role_id: i32) -> Option<Vec<LeftMenu>> {
             if left_menu.child.is_none() {
                 continue;
             }
-            let mut child: Option<Vec<Menu>> = None;
+            // let mut child: Option<Vec<Menu>> = None;
             let mut child: Vec<Menu> = Vec::new();
             for child_menu in left_menu.child.unwrap() {
                 if child_menu.path_full.is_none() {

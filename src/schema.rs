@@ -43,8 +43,9 @@ diesel::table! {
 diesel::table! {
     book_chapters (id) {
         id -> Int4,
-        bood_id -> Nullable<Int4>,
-        bood_name -> Nullable<Int4>,
+        book_id -> Nullable<Int4>,
+        #[max_length = 255]
+        book_name -> Nullable<Varchar>,
         #[max_length = 180]
         author -> Nullable<Varchar>,
         #[max_length = 255]
@@ -53,6 +54,7 @@ diesel::table! {
         visit -> Int8,
         previous -> Nullable<Int4>,
         next -> Nullable<Int4>,
+        publish -> Nullable<Bool>,
         #[max_length = 255]
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]

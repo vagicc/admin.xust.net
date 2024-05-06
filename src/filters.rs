@@ -28,6 +28,9 @@ pub fn all_routes(
     let hello = warp::path!("hello" / String).map(|name| format!("你好，{}!", name));
     let demo = demo_route::index();
 
+    let reptile = crate::routes::reptile_route::new();
+    let check = crate::routes::check_route::check_link();
+
     let routes = home
         .or(favicon)
         .or(well)
@@ -39,6 +42,8 @@ pub fn all_routes(
         .or(rights)
         .or(logout)
         .or(hello)
-        .or(demo);
+        .or(demo)
+        .or(check)
+        .or(reptile);
     routes
 }
