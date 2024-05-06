@@ -62,7 +62,7 @@ sha1 = "0.6.0"
 base64 = "0.22.0"
 
 #爬虫
-reqwest = { version="0.12.3",features=["socks","json","blocking","cookies","gzip","brotli","multipart","deflate"]}
+reqwest = { version="0.12.4",features=["socks","json","blocking","cookies","gzip","brotli","multipart","deflate"]}
 select = "0.6.0"
 url = "2.5.0"
 #爬虫下载相关
