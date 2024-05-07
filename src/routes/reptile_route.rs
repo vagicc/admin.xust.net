@@ -10,6 +10,14 @@ pub fn new() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection>
         .and(with_session())
         .and_then(reptile_handler::test_html_select);
 
+    let test_zhonghuadiancang = warp::get()
+        .and(warp::path("reptile"))
+        .and(warp::path("test"))
+        .and(warp::path("zhonghuadiancang"))
+        .and(warp::path::end())
+        .and(with_session())
+        .and_then(reptile_handler::test_zhonghuadiancang_detail);
+
     let post = warp::post()
         .and(warp::path("reptile"))
         .and(warp::path("new"))
@@ -25,4 +33,5 @@ pub fn new() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection>
         .and_then(reptile_handler::new_html)
         .or(post)
         .or(test)
+        .or(test_zhonghuadiancang)
 }

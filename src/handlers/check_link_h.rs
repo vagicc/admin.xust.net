@@ -40,6 +40,9 @@ pub async fn check_all_url(
         Ok(post) => {
             let url = post.url;
             let links = get_all_url(url).await;
+            if links.is_none() {
+                println!("为何为空：{:#?}", links);
+            }
             let links = links.unwrap();
             let next = next_level_url(&links, 1).await;
 
@@ -77,29 +80,30 @@ async fn next_level_url(
         /// let url = Url::parse("ftp://rms@example.com")?;
         /// assert_eq!(url.host_str(), Some("example.com"));
         let kk = link.host_str();
-        if kk!=Some("www.59fayi.com"){
+        if kk != Some("www.59fayi.com") {
             // println!("别的域名:{:#?}，不做抓取", kk);
             continue;
         }
         // println!("域名：{:#?}",kk);
         let url = link.as_str().to_string();
-        if !url.contains("/m/"){
+        if !url.contains("/m/") {
             //contains 包含的意思
             // println!("不是移动端");
             continue;
         }
         // println!("{}", url);
-        
+
         if !temp_links.contains(&link) {
-            println!("<li><a href=\"{}\">{0}</a></li>",url);
-             
+            println!("<li><a href=\"{}\">{0}</a></li>", url);
+
             temp_links.insert(link.clone()); //当前层
 
             if let Some(temp) = get_all_url(url).await {
                 temp_links.extend(temp.clone());
 
                 //取得差值，避免重复抓url
-                let difference:std::collections::HashSet<url::Url>=temp.difference(&links).cloned().collect();
+                let difference: std::collections::HashSet<url::Url> =
+                    temp.difference(&links).cloned().collect();
 
                 // 异步递归
                 // let future = Box::pin(next_level_url(&temp, depth + 1));
@@ -112,7 +116,7 @@ async fn next_level_url(
     temp_links
 }
 
-//取得当前页的所有URL
+//取得当前页的所有URL，这里还可以做检查是否只返回当前域名下的链接
 async fn get_all_url(url: String) -> Option<std::collections::HashSet<url::Url>> {
     let mut links: std::collections::HashSet<url::Url> = std::collections::HashSet::new();
     let res = reqwest::get(&url).await;

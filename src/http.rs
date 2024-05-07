@@ -1,8 +1,8 @@
 #[derive(Debug, Clone)]
 pub struct Request {
-    pub url: String,
-    pub base_url: String,
-    pub html: String,
+    pub url: String,  //要抓取的网址
+    pub base_url: String, //域名
+    pub html: String,  //抓取到的html
 }
 
 pub async fn http_request(url: &str) -> Option<Request> {

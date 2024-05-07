@@ -2,14 +2,104 @@
 pub struct ZhongHuaDianCangBook {
     pub book_name: String,        //书名
     pub book_author: String,      //作者
+    pub front_cover: String,      //front_cover IS '书封面图';
+    pub category: String,         //分类：名
     pub book_description: String, //书简介
+    //SEO标题 SEO关键词 SEO描述
+    pub seo_title: String,
+    pub seo_keywords: String,
+    pub seo_description: String,
+    //书的章节数组 book_chapters  章节名，章节URL
+    pub book_chapters: Vec<Chapter>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Chapter {
+    pub title: String, //章节名
+    pub url: String,   //章节URL
+}
+
+#[derive(Debug, Clone)]
+pub struct Chapters {
+    pub title: String,     //章节标题
+    pub content: String,   //章节内容
+    pub book_name: String, //书籍名称
+    //SEO标题 SEO关键词 SEO描述
+    pub seo_title: String,
+    pub seo_keywords: String,
+    pub seo_description: String,
+}
+
+//取  章节标题， 章节内容， SEO三大， 取个书名
+pub async fn zhdc_book_chapter_select(html: &str) -> Chapters {
+    use select::document::Document;
+    use select::predicate::{Attr, Class, Name, Predicate};
+    // let html = include_str!("src/views/reptile/中华典藏网书章节详情.html");  //这个用作测试
+    let document = Document::from(html);
+    let h1_node = document.find(Name("h1")).next().expect("找不到标签<h1>");
+    let h1_title = h1_node.text().trim().to_string(); //
+    log::debug!("章节标题：{}", h1_title);
+
+    //章节内容：<div id="content" class="panel-body">
+    let content_node = document
+        .find(Attr("id", "content"))
+        .next()
+        .expect("章节见容ID：content");
+    let content = content_node.text();
+    log::debug!("章节内容详情：{}", content);
+
+    // 处理SEO（tdk(t标题k关键词d描述）
+    let seo_title_node = document.find(Name("title")).next().expect("SEO<title>");
+    let seo_title = seo_title_node.text();
+    let seo_title = seo_title.trim_end_matches("_中华典藏").to_string(); //去掉尾部
+    let head_node = document.find(Name("head")).next().expect("");
+    let keywords_node = head_node.find(Attr("name", "keywords")).next().unwrap();
+    let keywords = keywords_node
+        .attr("content")
+        .expect("取得SEO关键字出错")
+        .to_string();
+    let description_node = head_node.find(Attr("name", "description")).next().unwrap();
+    let seo_description = description_node
+        .attr("content")
+        .expect("取得SEO描述出错")
+        .to_string();
+
+    log::debug!(
+        "SEO标题:{} \nSEO关键词：{:#?} \nSEO描述：{}",
+        seo_title, //卷之二_运气易览_汪机_在线阅读_中华典藏
+        keywords,
+        seo_description
+    );
+
+    //取书名
+    /*
+    <h3 class="panel-title">
+        <a href="https://www.zhonghuadiancang.com/xuanxuewushu/18783/">运气易览</a>
+        <p class="pull-right"><a href="https://www.zhonghuadiancang.com/renwu/wangji2/">汪机作品集</a>
+        </p>
+    </h3>
+    */
+    let h3_node = document.find(Name("h3")).next().expect("找不到标签<h3>");
+    let bookname_node = h3_node.find(Name("a")).next().expect("没书名");
+    let book_name = bookname_node.text();
+    log::debug!("书名：{}", book_name);
+
+    Chapters {
+        title: h1_title,      //章节标题
+        content: content,     //章节内容
+        book_name: book_name, //书籍名称
+        //SEO标题 SEO关键词 SEO描述
+        seo_title: seo_title,
+        seo_keywords: keywords,
+        seo_description: seo_description,
+    }
 }
 
 /// 解析“中华典藏” ：https://www.zhonghuadiancang.com/
 /// 书目录页：https://www.zhonghuadiancang.com/xueshuzaji/18289/
 /// let html = include_str!("html/temp.html");
 /// taobao_select(html).await;
-pub async fn zhonghuadiancang_select(html: &str) {
+pub async fn zhonghuadiancang_select(html: &str) -> ZhongHuaDianCangBook {
     use select::document::Document;
     use select::predicate::{Attr, Class, Name, Predicate};
 
@@ -23,10 +113,96 @@ pub async fn zhonghuadiancang_select(html: &str) {
                                                       //H1标题：百家姓注释  作者:佚名
                                                       //H1标题：运气易览  作者:汪机
                                                       //H1标题：素问灵枢心得  作者:胡文焕
-    println!("H1标题：{}", h1_title);
+
+    // println!("H1标题：{}", h1_title);
+    let title_vec: Vec<&str> = h1_title.split("作者").collect();
+    let title = title_vec
+        .first()
+        .expect("处理目录页文章标题出错")
+        .trim()
+        .to_string();
+    log::debug!("处理后的标题=={:#?}==", title); //=="中国道教史"==
+                                                 // let title = title_vec.nth(0); //取第一个元素
+
     let a_in_h1 = h1_node.find(Name("a")).next().unwrap();
-    let k = a_in_h1.text().trim().to_string(); //这里作者正确
-    println!("H1作者：{}", k);
+    let author = a_in_h1.text().trim().to_string(); //这里作者正确
+    log::debug!("H1作者：{}", author);
+
+    //取得封面
+    /*
+    <div class="fmpic"><img
+        src="https://www.zhonghuadiancang.com/d/file/142857df51c95c069a52184fc821810d.jpg"
+        alt="中国道教史"></div>
+    */
+    let front_cover_node = document
+        .find(Attr("class", "fmpic"))
+        .next()
+        .expect("找不到类：fmpic,处理书封面图");
+    let front_cover_node = front_cover_node
+        .find(Name("img"))
+        .next()
+        .expect("处理书封面图出错");
+    let cover_img = front_cover_node
+        .attr("src")
+        .expect("取得图片URL出错")
+        .to_string();
+    log::debug!("书封面图：{}", cover_img);
+
+    //书籍描述简介
+    /*
+    <p class="m-summary">提傅勤家著。傅勤家生卒年不详。生平履历不详。
+        “中国文化史丛书”之一,1937年商务印书馆出版。1984年上海书店影印。全书共二十章,依次为:绪言、
+        外人对于道教史之分期、诸书所述道教之起源、道之名义与其演变、道教以前之信仰、道教之形成
+        、道教之神、道教之方术、道教之修养、道教之规律、道佛二教之互相利用、道佛二教之相排、
+        唐宋两朝之道教、道教之流传海外、道教经典之编纂与焚毁、道教之分派、明清时代之道教、
+        现在之道藏与辑要、宫观及道徒、结论。
+    </p>
+    */
+    let description_node = document
+        .find(Attr("class", "m-summary"))
+        .next()
+        .expect("找不到类：m-summary,处理书封面图");
+    let book_description = description_node.text();
+    log::debug!("书籍简介：\n{}", book_description);
+
+    /*
+    分类名：
+    <div class="alert"
+        style="background: #fff;border-left: none;border-right: none;border-radius: 0;padding: 10px 15px;margin-bottom: 0;border-color: #ebebeb;">
+        <a href='https://www.zhonghuadiancang.com/tags-50-0.html' target='_blank'>近代</a> <a
+            href='https://www.zhonghuadiancang.com/tags-136-0.html' target='_blank'>学术</a>
+    </div>
+     */
+    let category_node = document
+        .find(Attr("class", "alert"))
+        .next()
+        .expect("找不到类：alert,处理书分类");
+    let category = category_node.text();
+    log::debug!("抓取的分类名：{}", category);
+    // let tem = category_node.find(Name(a));
+
+    // 处理SEO（tdk(t标题k关键词d描述）
+    let seo_title_node = document.find(Name("title")).next().expect("SEO<title>");
+    let seo_title = seo_title_node.text();
+    let seo_title = seo_title.trim_end_matches("_中华典藏").to_string(); //去掉尾部
+    let head_node = document.find(Name("head")).next().expect("");
+    let keywords_node = head_node.find(Attr("name", "keywords")).next().unwrap();
+    let keywords = keywords_node
+        .attr("content")
+        .expect("取得SEO关键字出错")
+        .to_string();
+    let description_node = head_node.find(Attr("name", "description")).next().unwrap();
+    let seo_description = description_node
+        .attr("content")
+        .expect("取得SEO描述出错")
+        .to_string();
+
+    log::debug!(
+        "SEO标题:{} \nSEO关键词：{:#?} \nSEO描述：{}",
+        seo_title,
+        keywords,
+        seo_description
+    );
 
     //<ul class="list-group" id="booklist"> 章节目录
     // let imgs_ul = document.find(Attr("id", "J_UlThumb")).next();
@@ -34,7 +210,8 @@ pub async fn zhonghuadiancang_select(html: &str) {
         .find(Attr("id", "booklist"))
         .next()
         .expect("找不到目录ID：booklist");
-    // let k = book_node.find(Name("li"));
+    let mut chapters: Vec<Chapter> = Vec::new();
+
     for li_node in book_node.find(Name("li")) {
         /*
         <li class="list-group-item col-md-6 vv-book">
@@ -43,14 +220,33 @@ pub async fn zhonghuadiancang_select(html: &str) {
         </li>
          */
         let li_title = li_node.text().trim().to_string(); //第一章　绪　言
-        println!("章节目录：{}", li_title);
+        log::debug!("章节目录：{}", li_title);
 
         let a_node = li_node.find(Name("a")).next().expect("msg");
-        let url = a_node.attr("href").unwrap();
-        println!("目录链接：{}", url);
+        let url = a_node.attr("href").unwrap().to_string();
+        log::debug!("目录链接：{}", url);
+        let temp = Chapter {
+            title: li_title,
+            url: url,
+        };
+        chapters.push(temp);
     }
 
-    log::warn!("到这里");
+    let book = ZhongHuaDianCangBook {
+        book_name: title,                   //书名
+        book_author: author,                //作者
+        front_cover: cover_img,             //front_cover IS '书封面图';
+        category: category,                 //分类：名
+        book_description: book_description, //书简介
+        //SEO标题 SEO关键词 SEO描述
+        seo_title: seo_title,
+        seo_keywords: keywords,
+        seo_description: seo_description,
+        //书的章节数组 book_chapters  章节名，章节URL
+        book_chapters: chapters,
+    };
+
+    book
 }
 //================================下面，都是以前没用的===============
 

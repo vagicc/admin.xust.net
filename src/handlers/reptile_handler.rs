@@ -56,9 +56,33 @@ pub async fn zhonghuadiancang(
             // println!("抓取到的html=========={}", html);
             println!("到这===");
             let data = crate::parse::zhonghuadiancang_select(html).await;
+            println!("攫取到的：{:#?}", data);
+            //开始循环去抓取详情页  ………………
         }
         Err(e) => {}
     }
-    let mut html = "后台命令去抓取法拍车".to_string();
+    let mut html = "抓取书目录页".to_string();
     Ok(warp::reply::html(html)) //直接返回html
+}
+
+pub async fn test_zhonghuadiancang_detail(
+    _: Session,
+) -> std::result::Result<impl Reply, Rejection> {
+    let url = "https://www.zhonghuadiancang.com/xuanxuewushu/18783/344485.html".to_string();
+    zhonghuadiancang_book_chapter(url).await;
+    Ok(warp::reply::html("这里用来测试HTML")) //直接返回html
+}
+
+//抓取书详细章节内容
+//测试url:https://www.zhonghuadiancang.com/xuanxuewushu/18783/344485.html
+async fn zhonghuadiancang_book_chapter(url: String) {
+    let result = crate::http::http_request(&url).await;
+    let response = result.unwrap();
+    // println!("response: {:?}", response);
+    let html = response.html.as_str();
+     
+    // println!("抓取到的html=========={}", html);
+    println!("到这===");
+    let data = crate::parse::zhdc_book_chapter_select(html).await;
+
 }
