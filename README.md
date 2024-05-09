@@ -6,6 +6,9 @@
 2024.03.21
 cargo new admin-xust-net
 
+下面这本书还是要看完的
+Rust语言圣经(Rust Course) https://course.rs/about-book.html
+
 应再建个表保存，再发布到另
 # 应该先抓书：“中华典藏” ：https://www.zhonghuadiancang.com/
 # 再做后台可用“布丁扫描”上传书。
