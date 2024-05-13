@@ -13,7 +13,7 @@ CREATE TABLE books (
     "collect" bigint DEFAULT 0,
     "seo_title" CHARACTER VARYING(255) DEFAULT NULL,
     "seo_keywords" CHARACTER VARYING(255) DEFAULT NULL,
-    "seo_description" CHARACTER VARYING(508) DEFAULT NULL,
+    "seo_description" CHARACTER VARYING(1000) DEFAULT NULL,
     "create_id" INTEGER DEFAULT NULL,
     "create_time" TIMESTAMP WITHOUT time ZONE DEFAULT clock_timestamp()
 );
@@ -52,7 +52,7 @@ CREATE TABLE "book_chapters"(
     "publish" BOOLEAN DEFAULT TRUE,
     "seo_title" CHARACTER VARYING(255) DEFAULT NULL,
     "seo_keywords" CHARACTER VARYING(255) DEFAULT NULL,
-    "seo_description" CHARACTER VARYING(508) DEFAULT NULL,
+    "seo_description" CHARACTER VARYING(1000) DEFAULT NULL,
     "create_id" INTEGER DEFAULT NULL,
     "create" bigint DEFAULT NULL,
     "last_time" TIMESTAMP WITHOUT time ZONE DEFAULT clock_timestamp()
@@ -84,7 +84,7 @@ CREATE TABLE book_category(
     "category" CHARACTER VARYING(20) UNIQUE NOT NULL,
     "seo_title" CHARACTER VARYING(255) DEFAULT NULL,
     "seo_keywords" CHARACTER VARYING(255) DEFAULT NULL,
-    "seo_description" CHARACTER VARYING(508) DEFAULT NULL,
+    "seo_description" CHARACTER VARYING(1000) DEFAULT NULL,
     "show" BOOLEAN DEFAULT TRUE,
     "order_by" SMALLINT DEFAULT 1,
     "modify_id" INTEGER DEFAULT NULL,

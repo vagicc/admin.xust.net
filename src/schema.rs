@@ -29,7 +29,7 @@ diesel::table! {
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]
         seo_keywords -> Nullable<Varchar>,
-        #[max_length = 508]
+        #[max_length = 1000]
         seo_description -> Nullable<Varchar>,
         show -> Nullable<Bool>,
         order_by -> Nullable<Int2>,
@@ -59,7 +59,7 @@ diesel::table! {
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]
         seo_keywords -> Nullable<Varchar>,
-        #[max_length = 508]
+        #[max_length = 1000]
         seo_description -> Nullable<Varchar>,
         create_id -> Nullable<Int4>,
         create -> Nullable<Int8>,
@@ -90,7 +90,7 @@ diesel::table! {
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]
         seo_keywords -> Nullable<Varchar>,
-        #[max_length = 508]
+        #[max_length = 1000]
         seo_description -> Nullable<Varchar>,
         create_id -> Nullable<Int4>,
         create_time -> Nullable<Timestamp>,
@@ -154,14 +154,14 @@ diesel::table! {
         front_cover_download -> Nullable<Bool>,
         #[max_length = 20]
         category -> Nullable<Varchar>,
-        #[max_length = 500]
+        #[max_length = 1800]
         description -> Nullable<Varchar>,
         finish -> Nullable<Bool>,
         #[max_length = 255]
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]
         seo_keywords -> Nullable<Varchar>,
-        #[max_length = 508]
+        #[max_length = 1000]
         seo_description -> Nullable<Varchar>,
         #[max_length = 255]
         reptile_url -> Varchar,
@@ -184,7 +184,7 @@ diesel::table! {
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]
         seo_keywords -> Nullable<Varchar>,
-        #[max_length = 508]
+        #[max_length = 1000]
         seo_description -> Nullable<Varchar>,
         #[max_length = 255]
         reptile_url -> Varchar,

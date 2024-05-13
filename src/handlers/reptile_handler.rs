@@ -49,6 +49,7 @@ pub async fn zhonghuadiancang(
 ) -> std::result::Result<impl Reply, Rejection> {
     log::debug!("post:{:#?}", form);
     match form.validate() {
+        //只处理目录URL不存在过抓取的
         Ok(post) if !reptile_zhdc_books_m::whether_link_exists(post.url.clone()) => {
             let url = post.url.as_str();
             //先判断是否存在
@@ -106,7 +107,7 @@ pub async fn zhonghuadiancang(
                     create_time: None,
                 }
                 .insert();
-                log::debug!("插入书章节ID：{}", insert_id);
+                log::warn!("插入书章节ID：{}", insert_id);
 
                 if insert_id == 0 {
                     log::error!("章节插入表出错！");
