@@ -20,4 +20,8 @@ Burn应该为最好的选择，开发官网：https://burn.dev/  公司官网：
 
 # 酷美网盘：https://www.kumeiwp.com/  免费音乐
 
+如何训练cloudflare的Workers AI来写文章？
 
+秘塔AI搜索： https://metaso.cn/  （比百度好）
+初创AI 
+KimiChat  官网：https://kimi.moonshot.cn/

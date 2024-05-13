@@ -29,7 +29,7 @@ diesel::table! {
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]
         seo_keywords -> Nullable<Varchar>,
-        #[max_length = 255]
+        #[max_length = 508]
         seo_description -> Nullable<Varchar>,
         show -> Nullable<Bool>,
         order_by -> Nullable<Int2>,
@@ -59,7 +59,7 @@ diesel::table! {
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]
         seo_keywords -> Nullable<Varchar>,
-        #[max_length = 255]
+        #[max_length = 508]
         seo_description -> Nullable<Varchar>,
         create_id -> Nullable<Int4>,
         create -> Nullable<Int8>,
@@ -82,7 +82,7 @@ diesel::table! {
         category_id -> Nullable<Int4>,
         #[max_length = 20]
         category -> Nullable<Varchar>,
-        #[max_length = 255]
+        #[max_length = 500]
         description -> Nullable<Varchar>,
         finish -> Nullable<Bool>,
         collect -> Nullable<Int8>,
@@ -90,7 +90,7 @@ diesel::table! {
         seo_title -> Nullable<Varchar>,
         #[max_length = 255]
         seo_keywords -> Nullable<Varchar>,
-        #[max_length = 255]
+        #[max_length = 508]
         seo_description -> Nullable<Varchar>,
         create_id -> Nullable<Int4>,
         create_time -> Nullable<Timestamp>,
@@ -141,6 +141,58 @@ diesel::table! {
 }
 
 diesel::table! {
+    reptile_zhdc_books (id) {
+        id -> Int4,
+        #[max_length = 255]
+        name -> Varchar,
+        #[max_length = 180]
+        author -> Nullable<Varchar>,
+        #[max_length = 255]
+        publishing -> Nullable<Varchar>,
+        #[max_length = 255]
+        front_cover -> Nullable<Varchar>,
+        front_cover_download -> Nullable<Bool>,
+        #[max_length = 20]
+        category -> Nullable<Varchar>,
+        #[max_length = 500]
+        description -> Nullable<Varchar>,
+        finish -> Nullable<Bool>,
+        #[max_length = 255]
+        seo_title -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_keywords -> Nullable<Varchar>,
+        #[max_length = 508]
+        seo_description -> Nullable<Varchar>,
+        #[max_length = 255]
+        reptile_url -> Varchar,
+        is_published -> Nullable<Bool>,
+        create_time -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    reptile_zhdc_chapters (id) {
+        id -> Int4,
+        zhdc_books_id -> Int4,
+        #[max_length = 255]
+        book_name -> Nullable<Varchar>,
+        #[max_length = 255]
+        title -> Varchar,
+        content -> Nullable<Text>,
+        publish -> Nullable<Bool>,
+        #[max_length = 255]
+        seo_title -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_keywords -> Nullable<Varchar>,
+        #[max_length = 508]
+        seo_description -> Nullable<Varchar>,
+        #[max_length = 255]
+        reptile_url -> Varchar,
+        create_time -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
     rights (right_id) {
         right_id -> Int4,
         #[max_length = 30]
@@ -171,6 +223,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     ci_sessions,
     menus,
     record,
+    reptile_zhdc_books,
+    reptile_zhdc_chapters,
     rights,
     roles,
 );

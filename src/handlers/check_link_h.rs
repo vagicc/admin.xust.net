@@ -103,7 +103,7 @@ Rust允许你通过环境变量RUST_MIN_STACK设置每个线程的最小堆栈�
 比如，你可以在运行你的程序前设置RUST_MIN_STACK=16777216，这将会把堆栈大小设置为16MB。
 但是需要注意的是，这个环境变量对主线程不起作用。
 刚372
-RUST_MIN_STACK=8388608 cargo run >> run.txt
+RUST_MIN_STACK=9677799996 cargo run >> run.txt
 上面这条命令临时解决，来自于
  */
 async fn next_level_url(links: &mut std::collections::HashSet<url::Url>, depth: usize) {
