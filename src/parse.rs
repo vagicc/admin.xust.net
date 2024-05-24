@@ -173,11 +173,17 @@ pub async fn zhonghuadiancang_select(html: &str) -> ZhongHuaDianCangBook {
             href='https://www.zhonghuadiancang.com/tags-136-0.html' target='_blank'>学术</a>
     </div>
      */
-    let category_node = document
-        .find(Attr("class", "alert"))
-        .next()
-        .expect("找不到类：alert,处理书分类");
-    let category = category_node.text();
+    // let category_node = document
+    //     .find(Attr("class", "alert"))
+    //     .next()
+    //     .expect("找不到类：alert,处理书分类");
+    let mut category = String::new();
+    let category_node = document.find(Attr("class", "alert")).next();
+    if category_node.is_some() {
+        category = category_node.expect("找不到类：alert,处理书分类").text();
+    }
+
+    // let category = category_node.text();
     log::debug!("抓取的分类名：{}", category);
     // let tem = category_node.find(Name(a));
 
