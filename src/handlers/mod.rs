@@ -8,3 +8,4 @@ pub mod menus_handler;
 pub mod reptile_handler;
 pub mod rights_handler;
 pub mod role_handler;
+pub mod zhdc_handler;

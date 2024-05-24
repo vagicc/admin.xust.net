@@ -9,6 +9,9 @@ diesel为PostgreSQL、Mysql及SQLite提供了开箱即用的支持
 英文在线文档：https://lib.rs/crates/diesel_cli
 diesel-cli命令行工具（创建、迁移）：
 
+两个数据库都要：
+cargo install diesel_cli --no-default-features --features postgres --features mysql
+
 安装diesel-cli工具(postgres)：cargo install diesel_cli --no-default-features --features postgres
 PostgreSQL错误解决的：sudo apt-get install libpq-dev
 
