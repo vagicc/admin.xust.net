@@ -10,34 +10,38 @@ pub fn new() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection>
         .and(with_session())
         .and_then(reptile_handler::test_html_select);
 
-    let test_zhonghuadiancang = warp::get()
+    warp::get()
         .and(warp::path("reptile"))
         .and(warp::path("test"))
         .and(warp::path("zhonghuadiancang"))
         .and(warp::path::end())
         .and(with_session())
-        .and_then(reptile_handler::test_zhonghuadiancang_detail);
+        .and_then(reptile_handler::test_zhonghuadiancang_detail)
+        .or(test)
+        .or(zhdc())
+}
 
-    let post = warp::post()
+//中华典藏网爬虫
+//GET: /reptile/zhonghuadiancang
+//GET: /reptile/zhonghuadiancang/new
+//POST: /reptile/zhonghuadiancang/new
+pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+    let new_post = warp::post()
         .and(warp::path("reptile"))
+        .and(warp::path("zhonghuadiancang"))
         .and(warp::path("new"))
         .and(warp::path::end())
         .and(warp::body::form())
         .and(with_session())
-        .and_then(reptile_handler::zhonghuadiancang);
-    warp::get()
+        .and_then(zhdc_handler::new);
+    let new = warp::get()
         .and(warp::path("reptile"))
+        .and(warp::path("zhonghuadiancang"))
         .and(warp::path("new"))
         .and(warp::path::end())
         .and(with_session())
-        .and_then(reptile_handler::new_html)
-        .or(post)
-        .or(test)
-        .or(test_zhonghuadiancang)
-        .or(zhdc())
-}
+        .and_then(zhdc_handler::new_html);
 
-pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     //GET: /reptile/zhonghuadiancang
     use crate::handlers::zhdc_handler;
 
@@ -58,7 +62,7 @@ pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection
                 zhdc_handler::list_page(1, get, session).await
             },
         );
-        
+
     warp::get()
         .and(warp::path("reptile"))
         .and(warp::path("zhonghuadiancang"))
