@@ -82,6 +82,10 @@ elapse@elapse-PC:/luck/Language/Rust/warp-wiki$
 “重做”应用的迁移：
           diesel migration revert
           diesel migration run
+例如，如果你想要重做名为000001_create_users_table的迁移，你可以这样做：
+diesel migration revert 000001_create_users_table
+diesel migration run 000001_create_users_table
+
 重做（等同于上面两条）：diesel migration redo
 上面命令，只能运行、还原或重做一次迁移
 重做所有的迁移：diesel database reset 

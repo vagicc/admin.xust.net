@@ -106,20 +106,22 @@ pub fn list_page(
         offset = ((page.unwrap() as i64) - 1) * limit;
     }
 
-    let mut name_where = String::new();
-    let mut publish_where = false;
-
-    if let Some(get_data) = whe {
-        name_where = get_data.book_name;
-        publish_where = get_data.is_published;
+    let mut query = reptile_zhdc_books.into_boxed();
+    let mut query_count = reptile_zhdc_books.into_boxed();
+    //可变的查询条件以上面结合下面的写法
+    if let Some(params) = whe {
+        if let Some(book_name) = params.book_name.filter(|n| !n.is_empty()) {
+            let name_like = format!("%{}%", book_name);
+            query = query.filter(name.like(name_like.clone()));
+            query_count = query_count.filter(name.like(name_like));
+        }
+        if let Some(published) = params.is_published {
+            query = query.filter(is_published.eq(published));
+            query_count = query_count.filter(is_published.eq(published));
+        }
     }
 
-    let mut query = reptile_zhdc_books.filter(is_published.eq(publish_where));
-    if !name_where.is_empty() {
-        query.filter(name.like(name_where)); //这个条件好像不生效
-    }
-
-    let query_count = query.count();
+    let query_count = query_count.count();
     log::error!(
         "reptile_zhdc_books分页数量查询SQL：{:#?}",
         diesel::debug_query::<diesel::pg::Pg, _>(&query_count).to_string()
@@ -150,6 +152,108 @@ pub fn list_page(
         .unwrap_or(data_null);
 
     // let page = page.unwrap_or(1);
-    pages = crate::pager::default_full("reptile/list", count, page.unwrap_or(1), limit as u32);
+    pages = crate::pager::default_full(
+        "reptile/zhonghuadiancang",
+        count,
+        page.unwrap_or(1),
+        limit as u32,
+    );
     (count, list, pages)
+}
+
+pub fn find_book(book_id: i32) -> Option<ReptileZhdcBooks> {
+    let query = reptile_zhdc_books.find(book_id);
+    let sql = diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string();
+    log::debug!("find_book查询SQL：{:?}", sql);
+    let mut connection = get_connection();
+    let result = query.first::<ReptileZhdcBooks>(&mut connection);
+    match result {
+        Ok(row) => Some(row),
+        Err(err) => {
+            log::debug!("find_book查无数据：{}", err);
+            None
+        }
+    }
+}
+
+// 发布
+pub fn publish_book(book_id: i32, all: bool) -> bool {
+    match find_book(book_id) {
+        Some(book) => {
+            //开启事务，发布书，all为true时再连同所有章节发布。最后修改本表为已发布
+            use crate::models::books_model;
+            let createid = 8;
+            let new_book = books_model::NewBooks {
+                name: book.name.clone(),
+                author: book.author.clone(),
+                publisher: book.publishing.clone(),
+                front_cover: book.front_cover.clone(),
+                price: None,
+                category_id: None,
+                category: book.category.clone(),
+                description: book.description.clone(),
+                finish: None,
+                collect: None,
+                seo_title: book.seo_title.clone(),
+                seo_keywords: book.seo_keywords.clone(),
+                seo_description: book.seo_description.clone(),
+                create_id: Some(createid),
+                create_time: None,
+            };
+            let new_book_id = new_book.insert();
+
+            if all {
+                //发布所有的章节
+                use crate::models::book_chapters_m;
+                use crate::models::reptile_zhdc_chapters_m;
+                let chapters = reptile_zhdc_chapters_m::get_book_chapters(book_id);
+                if chapters.is_none() {
+                    return true;
+                }
+                let mut previous: i32 = 0;
+                for chapter in chapters.unwrap() {
+                    let new_chapter = book_chapters_m::NewBookChapters {
+                        book_id: Some(new_book_id),
+                        book_name: chapter.book_name,
+                        author: book.author.clone(),
+                        title: chapter.title,
+                        content: chapter.content,
+                        visit: 0,
+                        previous: Some(previous), //上一章（ID）
+                        next: None,               //下一章（ID）
+                        publish: Some(false),     //未发布
+                        seo_title: chapter.seo_title,
+                        seo_keywords: chapter.seo_keywords,
+                        seo_description: chapter.seo_description,
+                        create_id: Some(createid),
+                        create: None, //创建时间( Unix 时间戳)
+                        last_time: None,
+                    };
+                    let insert_id = new_chapter.insert();
+                    if previous > 0 {
+                        //更新下一章。
+                        book_chapters_m::update_next(previous, insert_id);
+                    }
+                    previous = insert_id;
+                }
+            }
+
+            //更新为已发布
+            update_published(book_id, true);
+
+            true
+        }
+        None => false,
+    }
+}
+
+pub fn update_published(pky: i32, published: bool) {
+    let query = diesel::update(reptile_zhdc_books.find(pky)).set(is_published.eq(published));
+    log::error!(
+        "reptile_zhdc_books表更新数据SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+
+    let mut conn = get_connection();
+    let k = query.execute(&mut conn);
 }

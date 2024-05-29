@@ -11,19 +11,23 @@ use warp::{Rejection, Reply};
 //GET: /reptile/zhonghuadiancang
 pub async fn list_page(
     page: u32,
-    get: Option<GetQuery>,
+    get: GetQuery,
     session: Session,
 ) -> std::result::Result<impl Reply, Rejection> {
     log::debug!("GET: /reptile/zhonghuadiancang");
 
-    let per: u32 = 8; //每页总数
-    let (count, list, pages) = reptile_zhdc_books_m::list_page(Some(page), Some(per), get);
-
+    // let per: u32 = 18; //每页总数
+    let (count, list, pages) = reptile_zhdc_books_m::list_page(
+        Some(page),
+        Some(crate::constants::PER_PAGE),
+        Some(get.clone()),
+    );
 
     let mut data = Map::new();
     data.insert("list_len".to_string(), to_json(count)); //
     data.insert("list".to_string(), to_json(list)); //
     data.insert("pages".to_string(), to_json(pages));
+    data.insert("get".to_string(), to_json(get));
 
     // let html = to_html_single("reptile_new.html", data);
     let html = view("zhdc/list.html", data, session);
@@ -32,12 +36,11 @@ pub async fn list_page(
 }
 
 // GET查询条件
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GetQuery {
-    pub book_name: String,  //书名
-    pub is_published: bool, //是否已推送
+    pub book_name: Option<String>,  //书名
+    pub is_published: Option<bool>, //是否已推送
 }
-
 
 /* 响应： new_html*/
 pub async fn new_html(session: Session) -> std::result::Result<impl Reply, Rejection> {
@@ -50,7 +53,6 @@ pub async fn new_html(session: Session) -> std::result::Result<impl Reply, Rejec
     Ok(warp::reply::html(html)) //直接返回html
                                 // Err(warp::reject::not_found())   //错误的返回状态码
 }
-
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct NewPost {
@@ -65,17 +67,15 @@ impl NewPost {
     }
 }
 
-
 //https://www.zhonghuadiancang.com/xuanxuewushu/18616/
 //https://www.zhonghuadiancang.com/xuanxuewushu/18783/
 //https://www.zhonghuadiancang.com/xueshuzaji/18404/
 //https://www.zhonghuadiancang.com/xueshuzaji/18289/
 //处理抓取“中华典藏”
-pub async fn new(
-    form: NewPost,
-    session: Session,
-) -> std::result::Result<impl Reply, Rejection> {
+pub async fn new(form: NewPost, session: Session) -> std::result::Result<impl Reply, Rejection> {
     log::debug!("post:{:#?}", form);
+    let mut message = String::new();
+
     match form.validate() {
         //只处理目录URL不存在过抓取的
         Ok(post) if !reptile_zhdc_books_m::whether_link_exists(post.url.clone()) => {
@@ -110,6 +110,7 @@ pub async fn new(
             log::warn!("插入书目录ID：{}", zhdc_books_id);
             if zhdc_books_id == 0 {
                 log::debug!("目录插入表出错！");
+                message = "目录插入表出错！".to_string();
             }
 
             //开始循环去抓取详情页  ………………
@@ -141,13 +142,62 @@ pub async fn new(
                     log::error!("章节插入表出错！");
                 }
             }
-            println!("完成插入");
+
+            message = format!("书籍抓取成功，插入ID{}", zhdc_books_id);
+            log::debug!("{}", message);
         }
         Ok(_) => {
-            println!("可能存在过抓取的，就跑到这里处理了");
+            message = "可能存在过抓取的，就跑到这里处理了".to_string();
         }
         Err(e) => {}
     }
-    let mut html = "抓取书目录页".to_string();
+    log::debug!("{}", message);
+
+    // let mut html = "抓取书目录页".to_string();
+    let mut data = Map::new();
+    data.insert(
+        "jump_url".to_string(),
+        to_json("/reptile/zhonghuadiancang/new"),
+    );
+    data.insert("message".to_string(), to_json(message));
+
+    let html = to_html_single("hint.html", data);
+    Ok(warp::reply::html(html)) //直接返回html
+}
+
+pub async fn book(book_id: i32, session: Session) -> std::result::Result<impl Reply, Rejection> {
+    // 取得书籍信息，再取章节信息
+    let book = reptile_zhdc_books_m::find_book(book_id);
+    if book.is_none() {
+        log::warn!("Book {} not found,无此书", book_id);
+        // Err(())
+        //
+    }
+
+    let chapters = reptile_zhdc_chapters_m::get_book_chapters(book_id);
+
+    let mut data = Map::new();
+    data.insert("book".to_string(), to_json(book)); //
+    data.insert("chapters".to_string(), to_json(chapters)); //
+
+    // let html = to_html_single("reptile_new.html", data);
+    let html = view("zhdc/book.html", data, session);
+
+    Ok(warp::reply::html(html)) //直接返回html
+}
+
+//整本书籍发布
+//GET: reptile/zhonghuadiancang/publish/{{id}}
+pub async fn book_publish(
+    book_id: i32,
+    session: Session,
+) -> std::result::Result<impl Reply, Rejection> {
+    log::error!("整本发布start");
+    let k = reptile_zhdc_books_m::publish_book(book_id, true);
+    log::error!("整本发布end");
+
+    // let html = to_html_single("reptile_new.html", data);
+    // let html = view("zhdc/book.html", data, session);
+    let html = "整本发布";
     Ok(warp::reply::html(html)) //直接返回html
 }

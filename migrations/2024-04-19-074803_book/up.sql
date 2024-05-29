@@ -3,7 +3,7 @@ CREATE TABLE books (
     "id" SERIAL PRIMARY KEY,
     "name" CHARACTER VARYING(255) UNIQUE NOT NULL,
     "author" CHARACTER VARYING(180) DEFAULT NULL,
-    "publishing" CHARACTER VARYING(255) DEFAULT NULL,
+    "publisher" CHARACTER VARYING(255) DEFAULT NULL,
     "front_cover" CHARACTER VARYING(255) DEFAULT NULL,
     "price" MONEY DEFAULT 0.0,
     "category_id" INTEGER DEFAULT NULL,
@@ -24,7 +24,7 @@ CREATE INDEX idx_books_create_id ON books (create_id);
 COMMENT ON TABLE books IS '书籍表';
 COMMENT ON COLUMN books.name IS '书名';
 COMMENT ON COLUMN books.author IS '作者';
-COMMENT ON COLUMN books.publishing IS '出版社';
+COMMENT ON COLUMN books.publisher IS '出版社';
 COMMENT ON COLUMN books.front_cover IS '书封面图';
 COMMENT ON COLUMN books.price IS '原书定价';
 COMMENT ON COLUMN books.category_id IS '分类ID';

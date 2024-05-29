@@ -24,23 +24,42 @@ pub fn new() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection>
 //中华典藏网爬虫
 //GET: /reptile/zhonghuadiancang
 //GET: /reptile/zhonghuadiancang/new
+//GET: /reptile/zhonghuadiancang/publish/{{id}}
 //POST: /reptile/zhonghuadiancang/new
 pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    let new_post = warp::post()
+    let publish = warp::get()
         .and(warp::path("reptile"))
         .and(warp::path("zhonghuadiancang"))
-        .and(warp::path("new"))
+        .and(warp::path("publish"))
+        .and(warp::path::param())
         .and(warp::path::end())
-        .and(warp::body::form())
         .and(with_session())
-        .and_then(zhdc_handler::new);
+        .and_then(zhdc_handler::book_publish);
+
+    let book = warp::get()
+        .and(warp::path("reptile"))
+        .and(warp::path("zhonghuadiancang"))
+        .and(warp::path("book"))
+        .and(warp::path::param())
+        .and(warp::path::end())
+        .and(with_session())
+        .and_then(zhdc_handler::book);
+
     let new = warp::get()
         .and(warp::path("reptile"))
         .and(warp::path("zhonghuadiancang"))
         .and(warp::path("new"))
         .and(warp::path::end())
         .and(with_session())
-        .and_then(zhdc_handler::new_html);
+        .and_then(zhdc_handler::new_html)
+        .or(warp::post()
+            .and(warp::path("reptile"))
+            .and(warp::path("zhonghuadiancang"))
+            .and(warp::path("new"))
+            .and(warp::path::end())
+            .and(warp::body::form())
+            .and(with_session())
+            .and_then(zhdc_handler::new));
 
     //GET: /reptile/zhonghuadiancang
     use crate::handlers::zhdc_handler;
@@ -52,13 +71,13 @@ pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection
             Ok::<(Option<zhdc_handler::GetQuery>,), std::convert::Infallible>((None,))
         });
 
-    let first = warp::get()
+    let first_page = warp::get()
         .and(warp::path!("reptile" / "zhonghuadiancang"))
         .and(warp::path::end())
-        .and(opt_query)
+        .and(warp::query::<zhdc_handler::GetQuery>())
         .and(with_session())
         .and_then(
-            |get: Option<zhdc_handler::GetQuery>, session: crate::session::Session| async {
+            |get, session: crate::session::Session| async {
                 zhdc_handler::list_page(1, get, session).await
             },
         );
@@ -68,10 +87,13 @@ pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection
         .and(warp::path("zhonghuadiancang"))
         .and(warp::path::param())
         .and(warp::path::end())
-        .and(opt_query)
+        .and(warp::query::<zhdc_handler::GetQuery>())
         .and(with_session())
         .and_then(zhdc_handler::list_page)
-        .or(first)
+        .or(first_page)
+        .or(new)
+        .or(book)
+        .or(publish)
 
     // warp::get()
     //     .and(warp::path("reptile"))

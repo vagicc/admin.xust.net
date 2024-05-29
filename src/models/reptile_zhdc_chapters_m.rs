@@ -21,7 +21,6 @@ pub struct ReptileZhdcChapters {
     pub create_time: Option<NaiveDateTime>,
 }
 
-
 #[derive(Debug, Clone, Insertable, AsChangeset)]
 #[diesel(table_name = reptile_zhdc_chapters)]
 pub struct NewReptileZhdcChapters {
@@ -44,5 +43,24 @@ impl NewReptileZhdcChapters {
             .returning(id)
             .get_result::<i32>(&mut connection)
             .unwrap_or(0)
+    }
+}
+
+// 取得此书所有章节
+pub fn get_book_chapters(book_id: i32) -> Option<Vec<ReptileZhdcChapters>> {
+    let query = reptile_zhdc_chapters
+        .filter(zhdc_books_id.eq(book_id))
+        .order_by(id.asc());
+    let sql = diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string();
+    log::debug!("get_book_chapters查询SQL：{:?}", sql);
+
+    let mut connection = get_connection();
+
+    match query.get_results::<ReptileZhdcChapters>(&mut connection) {
+        Ok(list) => Some(list),
+        Err(err) => {
+            log::debug!("get_book_chapters查无数据：{}", err);
+            None
+        }
     }
 }

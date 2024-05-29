@@ -75,7 +75,7 @@ diesel::table! {
         #[max_length = 180]
         author -> Nullable<Varchar>,
         #[max_length = 255]
-        publishing -> Nullable<Varchar>,
+        publisher -> Nullable<Varchar>,
         #[max_length = 255]
         front_cover -> Nullable<Varchar>,
         price -> Nullable<Money>,

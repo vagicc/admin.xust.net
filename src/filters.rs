@@ -30,7 +30,7 @@ pub fn all_routes(
 
     let reptile = crate::routes::reptile_route::new();
     let check = crate::routes::check_route::check_link();
-
+    let book = crate::routes::book_route::index();
     let routes = home
         .or(favicon)
         .or(well)
@@ -44,6 +44,7 @@ pub fn all_routes(
         .or(hello)
         .or(demo)
         .or(check)
+        .or(book)
         .or(reptile);
     routes
 }

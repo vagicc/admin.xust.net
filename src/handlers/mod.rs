@@ -1,4 +1,5 @@
 pub mod admins_handler;
+pub mod book_handler;
 pub mod check_link_h;
 pub mod demo_handler;
 pub mod home_handler;

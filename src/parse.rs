@@ -100,6 +100,10 @@ pub async fn zhdc_book_chapter_select(html: &str) -> Chapters {
 /// let html = include_str!("html/temp.html");
 /// taobao_select(html).await;
 pub async fn zhonghuadiancang_select(html: &str) -> ZhongHuaDianCangBook {
+    println!("===========================================================");
+    // println!("{}", html);
+    println!("===========================================================");
+
     use select::document::Document;
     use select::predicate::{Attr, Class, Name, Predicate};
 
@@ -210,33 +214,94 @@ pub async fn zhonghuadiancang_select(html: &str) -> ZhongHuaDianCangBook {
         seo_description
     );
 
+    //加上到分类的章节
+    let mut chapters: Vec<Chapter> = Vec::new();
+    match document.find(Attr("id", "booklist")).next() {
+        Some(book_node) => {
+            //原来的书目录章节处理
+            //<ul class="list-group" id="booklist"> 章节目录
+            for li_node in book_node.find(Name("li")) {
+                /*
+                <li class="list-group-item col-md-6 vv-book">
+                <a href="https://www.zhonghuadiancang.com/xueshuzaji/18289/339342.html"
+                title="第一章　绪　言">第一章　绪　言</a>
+                </li>
+                 */
+                let li_title = li_node.text().trim().to_string(); //第一章　绪　言
+                log::debug!("章节目录：{}", li_title);
+
+                let a_node = li_node.find(Name("a")).next().expect("msg");
+                let url = a_node.attr("href").unwrap().to_string();
+                log::debug!("目录链接：{}", url);
+                let temp = Chapter {
+                    title: li_title,
+                    url: url,
+                };
+                chapters.push(temp);
+            }
+        }
+        None => {
+            //此处测试，还有章节错乱
+            log::error!("带分类的章节处理");
+            //测试书籍：https://www.zhonghuadiancang.com/xuanxuewushu/15308/
+            //<div class="panel panel-danger m-cover">
+            let chapters_node = document
+                .find(Attr("class", "panel panel-danger m-cover"))
+                .next()
+                .expect("找不到类：m-cover,处理带目录分类的章节");
+
+            let chapters_two = document
+                .find(Class("m-cover"))
+                .next()
+                .expect("找不到类：m-cover,处理带目录分类的章节");
+            //<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+            let mut chapters_ul = chapters_two.find(Name("ul"));
+            // println!("有多少个子节：{:#?}", chapters_ul);
+
+            // h3章节分类名如：第一章　出生前后
+            // <ul class="list-group">
+            //   <li class="list-group-item col-md-4 vv-book">
+            //        <a href="https://www.zhonghuadiancang.com/xuanxuewushu/15308/302873.html"
+            //            title="第一节　胎中之教养">第一节　胎中之教养</a></li>
+            // let h3_node = chapters_node.find(Name("h3"));
+            for (index, chapter) in chapters_node
+                .find(Name("h3"))
+                // .filter(|n| !n.is_empty())
+                .enumerate()
+            {
+                // 提取章节标题
+                let chapter_title = chapter.text().trim().to_string();
+                // println!("{}", chapter_title);
+                println!("{} {}", index, chapter_title);
+                // let section_list = chapter.next_sibling();
+
+                // 查找当前章节下的所有小节
+                // let c_ul_node=chapters_ul.nth(index);
+                if let Some(c_ul_node) = chapters_ul.nth(index) {
+                    for c_list in c_ul_node.find(Name("li")) {
+                        if let Some(c_link) = c_list.find(Name("a")).next() {
+                            let section_title = c_link.text().trim().to_string();
+                            let section_url = c_link.attr("href").unwrap_or("");
+                            println!("({}) {}", index, section_title);
+                            println!("  {}", section_url);
+                            
+                            let li_title=format!("{} {}",chapter_title, section_title);
+                            let url=section_url.to_string();
+                            let temp = Chapter {
+                                title: li_title,
+                                url: url,
+                            };
+                            chapters.push(temp);
+                        }
+                    }
+                } else {
+                    println!("为何出现在这里？？…………{}", index);
+                }
+            }
+        }
+    }
     //<ul class="list-group" id="booklist"> 章节目录
     // let imgs_ul = document.find(Attr("id", "J_UlThumb")).next();
-    let book_node = document
-        .find(Attr("id", "booklist"))
-        .next()
-        .expect("找不到目录ID：booklist");
-    let mut chapters: Vec<Chapter> = Vec::new();
-
-    for li_node in book_node.find(Name("li")) {
-        /*
-        <li class="list-group-item col-md-6 vv-book">
-        <a href="https://www.zhonghuadiancang.com/xueshuzaji/18289/339342.html"
-        title="第一章　绪　言">第一章　绪　言</a>
-        </li>
-         */
-        let li_title = li_node.text().trim().to_string(); //第一章　绪　言
-        log::debug!("章节目录：{}", li_title);
-
-        let a_node = li_node.find(Name("a")).next().expect("msg");
-        let url = a_node.attr("href").unwrap().to_string();
-        log::debug!("目录链接：{}", url);
-        let temp = Chapter {
-            title: li_title,
-            url: url,
-        };
-        chapters.push(temp);
-    }
 
     let book = ZhongHuaDianCangBook {
         book_name: title,                   //书名

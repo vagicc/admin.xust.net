@@ -2,7 +2,7 @@
 <div class="panel box-shadow-none content-header">
 	<div class="panel-body">
 		<div class="col-md-12">
-			<h3 class="animated fadeInLeft">中华典藏书籍</h3>
+			<h3 class="animated fadeInLeft">书籍</h3>
 			<div class="row">
 				<ol class="animated fadeInDown breadcrumb col-md-2 col-sm-12 col-xs-12">
 					<li><a href="{{base_url}}">首页</a></li>
@@ -24,17 +24,22 @@
 								<input type="text" name="book_name" value="{{get.book_name}}" placeholder="书名"
 									style="height:35px;width:100px">
 							</li>
+							<li>
+								<label>作者：</label>
+								<input type="text" name="book_author" value="{{get.book_author}}" placeholder="作者"
+									style="height:35px;width:100px">
+							</li>
 							<!-- <li>
                                 <label>货号：</label>
                                 <input type="text" name="goods_sn" value=" " placeholder="商品货号"
                                     style="height:35px;width:100px">
                             </li> -->
 							<li>
-								<label>发布：</label>
-								<select name="is_published" style="height:35px;width:180px">
-									<option value="null">请选择</option>
-									<option value="true" {{#if get.is_published}}selected{{/if}}>已发布</option>
-									<option value="false" {{#if get.is_published}}{{else}}selected{{/if}}>未发布</option>
+								<label>分类：</label>
+								<select name="c_id" style="height:35px;width:180px">
+									<option value="0">请选择</option>
+									<option value="1" {{#if (eq get.c_id 1)}}selected{{/if}}>医书</option>
+									<option value="2">未发布</option>
 								</select>
 							</li>
 
@@ -43,7 +48,7 @@
 									style="padding-right: 20px; padding-left: 20px;padding-top:5px;padding-bottom: 5px;">
 							</li>
 							<li>
-								<a href="{{base_url}}reptile/zhonghuadiancang" class="btn btn-outline btn-warning"
+								<a href="{{base_url}}book/list" class="btn btn-outline btn-warning"
 									style="padding-right: 20px; padding-left: 20px;padding-top:5px;padding-bottom: 5px;">重置</a>
 							</li>
 						</form>
@@ -66,8 +71,7 @@
 
 				<div class="col-md-12 " style="padding-bottom:20px;">
 					<!-- <a href="javascript:history.back(-1);" class="right btn btn-gradient btn-default" style="margin-left:8px;" >后退</a> -->
-					<a href="{{base_url}}reptile/zhonghuadiancang/new" title="新增"
-						class="right btn btn-gradient btn-info">新抓书籍</a>
+					<a href="{{base_url}}book/new" title="新增" class="right btn btn-gradient btn-info">新增书籍</a>
 					<h4 style="padding-left:10px;">列表<span style="font-size: 12px;"> (共{{list_len}}条)</span></h4>
 				</div>
 
@@ -154,7 +158,7 @@
 										class="btn btn-gradient btn-danger" value="删除" />
 
 									<!-- <input type="button" class=" btn btn-gradient btn-primary" value="修改" /> -->
-									<a href="{{base_url}}reptile/zhonghuadiancang/new" title="新增"
+									<a href="{{base_url}}book/new" title="新增"
 										class="btn  btn-gradient btn-success">新抓书籍</a>
 									<!-- <input type="button" class="btn btn-gradient btn-default" value="返回" /> -->
 									<input type="button" class="btn btn-gradient btn-default" value="后退"
@@ -171,7 +175,7 @@
 							{{else}}
 							<tr>
 								<td colspan="200" style="text-align: center;">
-									暂无数据!! 现在<a href="{{base_url}}reptile/zhonghuadiancang/new">新抓书籍</a>数据
+									暂无数据!! 现在<a href="{{base_url}}book/new">新抓书籍</a>数据
 								</td>
 							</tr>
 							{{/if}}

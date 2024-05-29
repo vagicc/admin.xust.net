@@ -1,4 +1,5 @@
 pub mod admins_route;
+pub mod book_route;
 pub mod check_route;
 pub mod demo_route;
 pub mod home_route;

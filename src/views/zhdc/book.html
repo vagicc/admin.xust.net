@@ -1,0 +1,146 @@
+{{#*inline "child"}}
+<div class="panel box-shadow-none content-header">
+    <div class="panel-body">
+        <div class="col-md-12">
+            <h3 class="animated fadeInLeft">{{book.name}}</h3>
+            <div class="row">
+                <ol class="animated fadeInDown breadcrumb col-md-2 col-sm-12 col-xs-12">
+                    <li><a href="{{base_url}}">首页</a></li>
+                    <li class="active">中华典藏书籍</li>
+
+                    <!--按钮-->
+                    <span class="hidden-md hidden-lg pull-right" id="search-btn"
+                        style="display: inline-block;cursor: pointer;">
+                        搜索
+                        <span class="caret"></span>
+                    </span>
+                </ol>
+                <!--搜索内容-->
+                <div class="col-md-10 col-sm-12 col-xs-12" id="search">
+                    <ul class="">
+                        <form method="get">
+                            <li>
+                                <label>书名：</label>
+                                <input type="text" name="book_name" value="" placeholder="书名"
+                                    style="height:35px;width:100px">
+                            </li>
+                            <!-- <li>
+                                <label>货号：</label>
+                                <input type="text" name="goods_sn" value=" " placeholder="商品货号"
+                                    style="height:35px;width:100px">
+                            </li> -->
+                            <li>
+                                <label>发布：</label>
+                                <select name="is_published" style="height:35px;width:180px">
+                                    <option value="">请选择</option>
+                                    <option value="true">已发布</option>
+                                    <option value="false">未发布</option>
+                                </select>
+                            </li>
+
+                            <li>
+                                <input type="submit" class="btn btn-outline btn-success" value="搜索"
+                                    style="padding-right: 20px; padding-left: 20px;padding-top:5px;padding-bottom: 5px;">
+                            </li>
+                            <li>
+                                <a href="{{base_url}}reptile/zhonghuadiancang" class="btn btn-outline btn-warning"
+                                    style="padding-right: 20px; padding-left: 20px;padding-top:5px;padding-bottom: 5px;">重置</a>
+                            </li>
+                        </form>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12 typography padding-0">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-body">
+                <center>
+                    <ul class="list-inline">
+                        <li>{{book.name}}</li>
+                      
+                    </ul>
+                </center>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="panel">
+                <div class="panel-body">
+                  <ul>
+                    <li>{{book.name}}
+                      <ol>
+                        {{#each chapters}}
+                        <li>{{title}}</li>
+                        {{/each}}
+                        
+                      </ol>
+                    </li>
+                    <!-- <li>Aenean tellus metus</li> -->
+                   
+                  </ul>
+                </div>
+              </div>
+        </div>
+        <div class="col-md-7">
+            <div class="panel">
+                <div class="panel-body">
+                    <blockquote>
+                        <p>
+                            {{book.description}}
+                        </p>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+<link type="text/css" href="asset/css/bootstrap-datetimepicker.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="asset/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="asset/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script src="asset/js/plugins/icheck.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('input').iCheck({
+            checkboxClass: 'icheckbox_flat-red',
+            radioClass: 'iradio_flat-red'
+        });
+
+        var width = $(window).width(); //获取屏幕宽度
+        //搜索居右设置,大于990就添加一个类样式
+        if (width > 990) {
+            $('#search ul').addClass('pull-right');
+        }
+        $("#search-btn").click(function () {
+            $('#search').toggle();
+        });
+
+        /*全选与反选*/
+        var num = 0;
+        $('.gou').next().each(function (i) {
+            $(this).on('click', function () {
+
+                if (num == 0) {
+                    $('.icheck').prop('checked', true).parent().addClass('checked');
+                    num += 1;
+                } else {
+                    $('.icheck').prop('checked', false).parent().removeClass('checked');
+                    num = 0;
+                }
+            });
+        });
+
+    });
+</script>
+
+{{/inline}}
+{{> (lookup this "parent")}}
