@@ -62,7 +62,7 @@
                 <center>
                     <ul class="list-inline">
                         <li>{{book.name}}</li>
-                      
+
                     </ul>
                 </center>
             </div>
@@ -70,20 +70,45 @@
         <div class="col-md-5">
             <div class="panel">
                 <div class="panel-body">
-                  <ul>
-                    <li>{{book.name}}
-                      <ol>
-                        {{#each chapters}}
-                        <li>{{title}}</li>
-                        {{/each}}
-                        
-                      </ol>
-                    </li>
-                    <!-- <li>Aenean tellus metus</li> -->
-                   
-                  </ul>
+                    <ul>
+                        <li>{{book.name}}
+                            <ol>
+                                <li>
+                                    <h5><code>H5</code> Headings <small>Sub Heading</small></h5>
+                                </li>
+                                {{#each chapters}}
+                                <li>{{title}}</li>
+                                <li>
+                                    <h5>
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal"
+                                            onclick="toggleMenu({{id}})">
+                                            {{title}}
+                                        </a>
+                                        <small>发布</small>
+
+                                    </h5>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal"
+                                        onclick="toggleMenu({{id}})">
+                                        <i class="fa  "></i>{{title}} 查看
+                                        <span class="text-muted">dddd</span>
+                                    </a>
+
+                                </li>
+                                <input type="hidden" name="book_name_{{id}}" value="{{title}}">
+                                <input type="hidden" name="book_content_{{id}}" value="{{content}}">
+
+                                <!-- <p>kkkkkkk=={{content}}========</p> -->
+                                {{/each}}
+
+                            </ol>
+                        </li>
+                        <!-- <li>Aenean tellus metus</li> -->
+
+                    </ul>
                 </div>
-              </div>
+            </div>
         </div>
         <div class="col-md-7">
             <div class="panel">
@@ -96,9 +121,44 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </div>
+
+
+<!-- 模态框（Modal） 弹窗修改 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="接收表间的URl" class="cmxform" id="signupForm">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        提币审核
+                    </h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="col-md-12 panel-body" style="padding-bottom:30px;">
+                        <div class="col-md-12">
+                            <div id="description_content"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                    </button>
+                    <!-- <input type="submit" class="btn btn-primary" value="确定" /> -->
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 模态框（Modal）结束 -->
+
 
 
 <link type="text/css" href="asset/css/bootstrap-datetimepicker.css" rel="stylesheet" media="screen">
@@ -139,7 +199,55 @@
             });
         });
 
+        /* 弹窗模组JS */
+        $('#myModal').on('show.bs.modal', function () {
+            // 在调用 show 方法后触发,执行一些动作...
+            // alert('1.在调用 show 方法后触发。');
+            // 取得动态值
+            // var u_id = $("#coinTopUpWithdrawalID").val();
+            // alert(u_id);
+
+            // var addtr = '<tr><td colspan="200" style="text-align: center;">这是新增加的一行哦!!</td></tr>';
+            // $(".modal-table-list").append(addtr);// 增加列表一行
+        });
+
+        $('#myModal').on('shown.bs.modal', function () {
+            // 当模态框对用户可见时触发（将等待 CSS 过渡效果完成）,执行一些动作...
+            // alert('2.当模态框对用户可见时触发（将等待 CSS 过渡效果完成）');
+        });
+
+        $('#myModal').on('hide.bs.modal', function () {
+            // 当调用 hide 实例方法时触发，执行一些动作...
+            // alert('3.当调用 hide 实例方法时触发 ');
+        })
+
+        $('#myModal').on('hidden.bs.modal', function () {
+            // 当模态框完全对用户隐藏时触发,执行一些动作...
+            // alert('4.当模态框完全对用户隐藏时触发');
+        });
+
     });
+
+    /* 动态修改弹窗里的用户ID */
+    function toggleMenu(id) {
+        var book_name = $('input[name="book_name_' + id + '"]').val();
+        var book_description = $('input[name="book_content_' + id + '"]').val();
+
+        // 按行分割文本，并使用jQuery的each方法遍历每一行
+        $.each(book_description.split('\n'), function (index, line) {
+            // 过滤掉空行或只含空白的行
+            if (line.trim() !== '') {
+                // 包装每行文本为<p>标签，并添加到container中
+                $('#description_content').append('<p>' + line + '</p>');
+            }
+        });
+
+        // book_description_
+        $("#myModalLabel").html("章节： " + book_name);
+        // $("#description_content").html(book_description);
+        // alert('更改信息先');
+        // $("#coinTopUpWithdrawalID").val(id);
+    }
 </script>
 
 {{/inline}}

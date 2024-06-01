@@ -12,8 +12,9 @@ Rust语言圣经(Rust Course) https://course.rs/about-book.html
 
 # 应该先抓书：“中华典藏” ：https://www.zhonghuadiancang.com/
 做已抓取到书的列表，再做点预览，点修改-发布
-
-# 再做后台可用“布丁扫描”上传书。
+章节一章发布
+书籍发布……
+# 再做后台可用“布丁扫描”上传书。   
 # 发布站点。
 # 把elapse.date的文章迁过来
 

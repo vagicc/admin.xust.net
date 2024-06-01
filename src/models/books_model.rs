@@ -184,3 +184,20 @@ pub fn list_page(
 
     (count, list, pages)
 }
+
+///通过书名取得书籍信息
+pub fn get_book(book_name: String)-> Option<Books> {
+    let query = books.filter(name.eq(book_name));
+    let sql = diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string();
+    log::debug!("get_book查询SQL：{:?}", sql);
+    let mut connection = get_connection();
+    let result = query.first::<Books>(&mut connection);
+    match result {
+        Ok(row) => Some(row),
+        Err(err) => {
+            log::debug!("get_admin查无数据：{}", err);
+            None
+        }
+    }
+}
+

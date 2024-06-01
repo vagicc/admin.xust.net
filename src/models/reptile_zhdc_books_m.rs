@@ -201,6 +201,10 @@ pub fn publish_book(book_id: i32, all: bool) -> bool {
                 create_time: None,
             };
             let new_book_id = new_book.insert();
+            if new_book_id == 0 {
+                log::error!("插入到书籍表出错！！");
+                return false;
+            }
 
             if all {
                 //发布所有的章节
