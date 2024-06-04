@@ -64,3 +64,33 @@ pub fn get_book_chapters(book_id: i32) -> Option<Vec<ReptileZhdcChapters>> {
         }
     }
 }
+
+//更新所有章节为已发布
+pub fn update_book_publish(book_id: i32, published: bool) {
+    let query = diesel::update(reptile_zhdc_chapters.filter(zhdc_books_id.eq(book_id)))
+        .set(publish.eq(published));
+    log::error!(
+        "reptile_zhdc_chapters表更新书籍所有章节发布状态SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+
+    let mut conn = get_connection();
+    let _ = query.execute(&mut conn);
+}
+
+//更新指定章节为已发布
+pub fn update_publish(pky: i32, published: bool) -> Option<ReptileZhdcChapters> {
+    let query = diesel::update(reptile_zhdc_chapters.find(pky)).set(publish.eq(published));
+    log::error!(
+        "reptile_zhdc_chapters表更新指定章节发布状态SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+    let mut conn = get_connection();
+    match query.get_result::<ReptileZhdcChapters>(&mut conn) {
+        Ok(result) => Some(result),
+        Err(err) => {
+            log::error!("reptile_zhdc_chapters表修改数据失败：{}", err);
+            None
+        }
+    }
+}

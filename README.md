@@ -1,5 +1,7 @@
 # admin.xust.net
 # 这www.xust.net的后台管理
+# 做完书籍，能发布文章，能发布书，就学AI框架:
+Burn应该为最好的选择，开发官网：https://burn.dev/  公司官网：https://tracel.ai/
 
 运行项目前，请先把“env”文件改为“.env”并查看里面的配置对应本机配置
 
@@ -37,7 +39,7 @@ KimiChat  官网：https://kimi.moonshot.cn/
 下面这条备份语句排除表__diesel_schema_migrations、admins、roles menus的数据备份
 pg_dump -h 127.0.0.1 -U postgres -a -O --inserts -d xust -T __diesel_schema_migrations -T admins -T roles -T menus -f xust.bf.2024.5.14.sql
 恢复：
-先去创建数据库，再执行下行语句
+先去创建数据库，再执行下行语句恢复数据库
 psql -h 107.174.102.197 -U postgres -d xust -f xust.bf.2024.5.14.sql
 psql -h 127.0.0.1 -U postgres -d xust -f xust.bf.2024.5.14.sql
 

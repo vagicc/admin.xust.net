@@ -190,14 +190,65 @@ pub async fn book(book_id: i32, session: Session) -> std::result::Result<impl Re
 //GET: reptile/zhonghuadiancang/publish/{{id}}
 pub async fn book_publish(
     book_id: i32,
-    session: Session,
+    _session: Session,
 ) -> std::result::Result<impl Reply, Rejection> {
-    log::error!("整本发布start");
-    let k = reptile_zhdc_books_m::publish_book(book_id, true);
-    log::error!("整本发布end");
+    let mut message = String::new();
 
-    // let html = to_html_single("reptile_new.html", data);
-    // let html = view("zhdc/book.html", data, session);
-    let html = "整本发布";
-    Ok(warp::reply::html(html)) //直接返回html
+    log::debug!("整本发布start");
+    if reptile_zhdc_books_m::publish_book(book_id, true, None) {
+        message = format!("书籍ID：{} 发布成功!", book_id);
+    } else {
+        message = format!("书籍ID：{} 失败了", book_id);
+    }
+    log::debug!("{},整本发布end", message);
+
+    let mut data = Map::new();
+    data.insert("jump_url".to_string(), to_json("/reptile/zhonghuadiancang"));
+    data.insert("message".to_string(), to_json(message));
+
+    let html = to_html_single("hint.html", data);
+    Ok(warp::reply::html(html)) //to_html_single
+}
+
+// 这里还没想清楚，
+// 发布此章：
+// 判断书是否已插到 book表（finish设置为false为未完结），
+//                   把所有章节插到book_chapters表（设置为未发布），
+//                   并把当前章节设置为已发布
+// 更新reptile_zhdc_books为已发布，更新reptile_zhdc_chapters本章为已发布
+pub async fn book_chapter_publish(
+    chapter_id: i32,
+    _session: Session,
+) -> std::result::Result<impl Reply, Rejection> {
+    let mut message = String::new();
+    let mut jump_url = "/reptile/zhonghuadiancang/chapter/publish/".to_string();
+
+    message = "未想清楚，未完成".to_string();
+    log::debug!("一章发布start");
+    match reptile_zhdc_chapters_m::update_publish(chapter_id, true) {
+        Some(chapter) => {
+            //检查书是否为已发布？
+            let zhdc_book =
+                reptile_zhdc_books_m::find_book(chapter.zhdc_books_id).expect("爬虫表查无此书籍");
+
+            // 判断书是否已插到 book表
+            if zhdc_book.is_published.is_none() || !zhdc_book.is_published.unwrap() {
+                log::debug!("书未发布");
+                //publish_book
+                reptile_zhdc_books_m::publish_book(chapter.zhdc_books_id, false, Some(chapter_id));
+            } else {
+            }
+
+            message = format!("章节ID：{} 发布成功!", chapter_id);
+            jump_url = format!("/reptile/zhonghuadiancang/book/{}", chapter.zhdc_books_id);
+        }
+        None => {}
+    }
+    log::debug!("一章发布end");
+
+    let mut data = Map::new();
+    data.insert("jump_url".to_string(), to_json(jump_url));
+    data.insert("message".to_string(), to_json(message));
+    let html = to_html_single("hint.html", data);
+    Ok(warp::reply::html(html))
 }

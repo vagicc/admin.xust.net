@@ -176,8 +176,11 @@ pub fn find_book(book_id: i32) -> Option<ReptileZhdcBooks> {
     }
 }
 
-// 发布
-pub fn publish_book(book_id: i32, all: bool) -> bool {
+// 发布 publish
+// publish_all:true全部发布，false只发布一章
+// chapter_id：只发布的章节ID
+//(publish_all为false,并传入chapter_id时，只发布当前章节)
+pub fn publish_book(book_id: i32, publish_all: bool, chapter_id: Option<i32>) -> bool {
     match find_book(book_id) {
         Some(book) => {
             //开启事务，发布书，all为true时再连同所有章节发布。最后修改本表为已发布
@@ -192,7 +195,7 @@ pub fn publish_book(book_id: i32, all: bool) -> bool {
                 category_id: None,
                 category: book.category.clone(),
                 description: book.description.clone(),
-                finish: None,
+                finish: Some(publish_all),  //是否已完结
                 collect: None,
                 seo_title: book.seo_title.clone(),
                 seo_keywords: book.seo_keywords.clone(),
@@ -206,41 +209,50 @@ pub fn publish_book(book_id: i32, all: bool) -> bool {
                 return false;
             }
 
-            if all {
-                //发布所有的章节
-                use crate::models::book_chapters_m;
-                use crate::models::reptile_zhdc_chapters_m;
-                let chapters = reptile_zhdc_chapters_m::get_book_chapters(book_id);
-                if chapters.is_none() {
-                    return true;
-                }
-                let mut previous: i32 = 0;
-                for chapter in chapters.unwrap() {
-                    let new_chapter = book_chapters_m::NewBookChapters {
-                        book_id: Some(new_book_id),
-                        book_name: chapter.book_name,
-                        author: book.author.clone(),
-                        title: chapter.title,
-                        content: chapter.content,
-                        visit: 0,
-                        previous: Some(previous), //上一章（ID）
-                        next: None,               //下一章（ID）
-                        publish: Some(false),     //未发布
-                        seo_title: chapter.seo_title,
-                        seo_keywords: chapter.seo_keywords,
-                        seo_description: chapter.seo_description,
-                        create_id: Some(createid),
-                        create: None, //创建时间( Unix 时间戳)
-                        last_time: None,
-                    };
-                    let insert_id = new_chapter.insert();
-                    if previous > 0 {
-                        //更新下一章。
-                        book_chapters_m::update_next(previous, insert_id);
-                    }
-                    previous = insert_id;
-                }
+            //================================start===================
+
+            //发布所有的章节
+            use crate::models::book_chapters_m;
+            use crate::models::reptile_zhdc_chapters_m;
+            let chapters = reptile_zhdc_chapters_m::get_book_chapters(book_id);
+            if chapters.is_none() {
+                return true;
             }
+            let mut previous: i32 = 0;
+            for chapter in chapters.unwrap() {
+                let mut p = publish_all;
+                if !publish_all && chapter_id.is_some() {
+                    if chapter_id.unwrap() == chapter.id {
+                        p = true;
+                    }
+                }
+                let new_chapter = book_chapters_m::NewBookChapters {
+                    book_id: Some(new_book_id),
+                    book_name: chapter.book_name,
+                    author: book.author.clone(),
+                    title: chapter.title,
+                    content: chapter.content,
+                    visit: 0,
+                    previous: Some(previous), //上一章（ID）
+                    next: None,               //下一章（ID）
+                    publish: Some(p),         //是否发布
+                    seo_title: chapter.seo_title,
+                    seo_keywords: chapter.seo_keywords,
+                    seo_description: chapter.seo_description,
+                    create_id: Some(createid),
+                    create: None, //创建时间( Unix 时间戳)
+                    last_time: None,
+                };
+                let insert_id = new_chapter.insert();
+                if previous > 0 {
+                    //更新下一章。
+                    book_chapters_m::update_next(previous, insert_id);
+                }
+                previous = insert_id;
+            }
+            //更新所有章节为已发布
+            reptile_zhdc_chapters_m::update_book_publish(book_id, true);
+            //================================end===================
 
             //更新为已发布
             update_published(book_id, true);
@@ -259,5 +271,5 @@ pub fn update_published(pky: i32, published: bool) {
     );
 
     let mut conn = get_connection();
-    let k = query.execute(&mut conn);
+    let _ = query.execute(&mut conn);
 }

@@ -100,9 +100,9 @@ pub async fn zhdc_book_chapter_select(html: &str) -> Chapters {
 /// let html = include_str!("html/temp.html");
 /// taobao_select(html).await;
 pub async fn zhonghuadiancang_select(html: &str) -> ZhongHuaDianCangBook {
-    println!("===========================================================");
+    // println!("===========================================================");
     // println!("{}", html);
-    println!("===========================================================");
+    // println!("===========================================================");
 
     use select::document::Document;
     use select::predicate::{Attr, Class, Name, Predicate};

@@ -73,33 +73,27 @@
                     <ul>
                         <li>{{book.name}}
                             <ol>
-                                <li>
-                                    <h5><code>H5</code> Headings <small>Sub Heading</small></h5>
-                                </li>
                                 {{#each chapters}}
-                                <li>{{title}}</li>
                                 <li>
                                     <h5>
-                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal"
-                                            onclick="toggleMenu({{id}})">
-                                            {{title}}
-                                        </a>
-                                        <small>发布</small>
-
+                                        <code>
+                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal" onclick="toggleMenu({{id}})">{{title}}</a>
+                                        </code>
+                                        <small>
+                                            {{#if ../book.is_published}}
+                                            {{else}}
+                                            {{#if publish}}
+                                            {{else}}
+                                            <a href="/reptile/zhonghuadiancang/chapter/publish/{{id}}" class="fa fa-arrow-circle" style="color: black">发布此章</a>
+                                            {{/if}}
+                                            {{/if}}
+                                        </small>
                                     </h5>
                                 </li>
-                                <li>
-                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal"
-                                        onclick="toggleMenu({{id}})">
-                                        <i class="fa  "></i>{{title}} 查看
-                                        <span class="text-muted">dddd</span>
-                                    </a>
 
-                                </li>
                                 <input type="hidden" name="book_name_{{id}}" value="{{title}}">
                                 <input type="hidden" name="book_content_{{id}}" value="{{content}}">
 
-                                <!-- <p>kkkkkkk=={{content}}========</p> -->
                                 {{/each}}
 
                             </ol>
@@ -231,6 +225,7 @@
     /* 动态修改弹窗里的用户ID */
     function toggleMenu(id) {
         var book_name = $('input[name="book_name_' + id + '"]').val();
+        $("#description_content").html("");
         var book_description = $('input[name="book_content_' + id + '"]').val();
 
         // 按行分割文本，并使用jQuery的each方法遍历每一行

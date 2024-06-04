@@ -25,6 +25,7 @@ pub fn new() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection>
 //GET: /reptile/zhonghuadiancang
 //GET: /reptile/zhonghuadiancang/new
 //GET: /reptile/zhonghuadiancang/publish/{{id}}
+//GET: /reptile/zhonghuadiancang/chapter/publish/{{id}}
 //POST: /reptile/zhonghuadiancang/new
 pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     let publish = warp::get()
@@ -35,6 +36,16 @@ pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection
         .and(warp::path::end())
         .and(with_session())
         .and_then(zhdc_handler::book_publish);
+
+    let chapter_publish = warp::get()
+        .and(warp::path("reptile"))
+        .and(warp::path("zhonghuadiancang"))
+        .and(warp::path("chapter"))
+        .and(warp::path("publish"))
+        .and(warp::path::param())
+        .and(warp::path::end())
+        .and(with_session())
+        .and_then(zhdc_handler::book_chapter_publish);
 
     let book = warp::get()
         .and(warp::path("reptile"))
@@ -76,11 +87,9 @@ pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection
         .and(warp::path::end())
         .and(warp::query::<zhdc_handler::GetQuery>())
         .and(with_session())
-        .and_then(
-            |get, session: crate::session::Session| async {
-                zhdc_handler::list_page(1, get, session).await
-            },
-        );
+        .and_then(|get, session: crate::session::Session| async {
+            zhdc_handler::list_page(1, get, session).await
+        });
 
     warp::get()
         .and(warp::path("reptile"))
@@ -94,11 +103,5 @@ pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection
         .or(new)
         .or(book)
         .or(publish)
-
-    // warp::get()
-    //     .and(warp::path("reptile"))
-    //     .and(warp::path("zhonghuadiancang"))
-    //     .and(warp::path::end())
-    //     .and(with_session())
-    //     .and_then(zhdc_handler::list_old)
+        .or(chapter_publish)
 }
