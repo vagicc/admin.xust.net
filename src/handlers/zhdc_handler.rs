@@ -210,7 +210,6 @@ pub async fn book_publish(
     Ok(warp::reply::html(html)) //to_html_single
 }
 
-// 这里还没想清楚，
 // 发布此章：
 // 判断书是否已插到 book表（finish设置为false为未完结），
 //                   把所有章节插到book_chapters表（设置为未发布），
@@ -248,6 +247,32 @@ pub async fn book_chapter_publish(
 
     let mut data = Map::new();
     data.insert("jump_url".to_string(), to_json(jump_url));
+    data.insert("message".to_string(), to_json(message));
+    let html = to_html_single("hint.html", data);
+    Ok(warp::reply::html(html))
+}
+
+// 响应GET: /reptile/zhonghuadiancang/del/{{id}}
+pub async fn delete(id: i32, session: crate::session::Session) -> Result<impl Reply, Rejection> {
+    let mut message = String::new();
+
+    let mut delete_row = reptile_zhdc_books_m::delete(id);
+
+    if delete_row > 0 {
+        //删除章节表
+        delete_row += reptile_zhdc_chapters_m::delete_book(id);
+        log::warn!("删除了{}章！", delete_row);
+    }
+
+    message = format!("ID{},删除了{}条数据", id, delete_row);
+
+    // 跳转到列表页
+    // Ok(warp::redirect::see_other(warp::http::Uri::from_static(
+    //     "/menus/index",
+    // )))
+
+    let mut data = Map::new();
+    data.insert("jump_url".to_string(), to_json("/reptile/zhonghuadiancang"));
     data.insert("message".to_string(), to_json(message));
     let html = to_html_single("hint.html", data);
     Ok(warp::reply::html(html))

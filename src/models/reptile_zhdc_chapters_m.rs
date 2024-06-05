@@ -94,3 +94,24 @@ pub fn update_publish(pky: i32, published: bool) -> Option<ReptileZhdcChapters> 
         }
     }
 }
+
+pub fn delete_book(book_id: i32)-> usize {
+    let query = diesel::delete(reptile_zhdc_chapters.filter(zhdc_books_id.eq(book_id)));
+    log::debug!(
+        "reptile_zhdc_chapters表删除SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+    let mut conn = get_connection();
+    let deleted_rows = query.execute(&mut conn);
+    // crate::common::type_v(deleted_rows);
+    //变量值：Ok(1)  =>类型： core::result::Result<usize, diesel::result::Error>  删除成功1条数据
+    //变量值：Ok(0)  =>类型： core::result::Result<usize, diesel::result::Error>  删除成功0条数据
+
+    match deleted_rows {
+        Ok(row) => row,
+        Err(e) => {
+            log::error!("reptile_zhdc_chapters表删除数据失败：{}", e);
+            0
+        }
+    }
+}

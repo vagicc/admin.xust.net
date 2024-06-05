@@ -195,7 +195,7 @@ pub fn publish_book(book_id: i32, publish_all: bool, chapter_id: Option<i32>) ->
                 category_id: None,
                 category: book.category.clone(),
                 description: book.description.clone(),
-                finish: Some(publish_all),  //是否已完结
+                finish: Some(publish_all), //是否已完结
                 collect: None,
                 seo_title: book.seo_title.clone(),
                 seo_keywords: book.seo_keywords.clone(),
@@ -272,4 +272,25 @@ pub fn update_published(pky: i32, published: bool) {
 
     let mut conn = get_connection();
     let _ = query.execute(&mut conn);
+}
+
+pub fn delete(pky: i32) -> usize {
+    let query = diesel::delete(reptile_zhdc_books.find(pky));
+    log::debug!(
+        "reptile_zhdc_books表删除SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+    let mut conn = get_connection();
+    let deleted_rows = query.execute(&mut conn);
+    // crate::common::type_v(deleted_rows);
+    //变量值：Ok(1)  =>类型： core::result::Result<usize, diesel::result::Error>  删除成功1条数据
+    //变量值：Ok(0)  =>类型： core::result::Result<usize, diesel::result::Error>  删除成功0条数据
+
+    match deleted_rows {
+        Ok(row) => row,
+        Err(e) => {
+            log::error!("reptile_zhdc_books表删除数据失败：{}", e);
+            0
+        }
+    }
 }

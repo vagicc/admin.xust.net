@@ -26,8 +26,18 @@ pub fn new() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection>
 //GET: /reptile/zhonghuadiancang/new
 //GET: /reptile/zhonghuadiancang/publish/{{id}}
 //GET: /reptile/zhonghuadiancang/chapter/publish/{{id}}
+//GET: /reptile/zhonghuadiancang/del/{{id}}
 //POST: /reptile/zhonghuadiancang/new
 pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+    let delete = warp::get()
+        .and(warp::path("reptile"))
+        .and(warp::path("zhonghuadiancang"))
+        .and(warp::path("del"))
+        .and(warp::path::param())
+        .and(warp::path::end())
+        .and(with_session())
+        .and_then(zhdc_handler::delete);
+
     let publish = warp::get()
         .and(warp::path("reptile"))
         .and(warp::path("zhonghuadiancang"))
@@ -76,7 +86,7 @@ pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection
     use crate::handlers::zhdc_handler;
 
     //接收GET查询条件
-    let opt_query = warp::query::<zhdc_handler::GetQuery>()
+    let _opt_query = warp::query::<zhdc_handler::GetQuery>()
         .map(Some)
         .or_else(|_| async {
             Ok::<(Option<zhdc_handler::GetQuery>,), std::convert::Infallible>((None,))
@@ -104,4 +114,5 @@ pub fn zhdc() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection
         .or(book)
         .or(publish)
         .or(chapter_publish)
+        .or(delete)
 }
