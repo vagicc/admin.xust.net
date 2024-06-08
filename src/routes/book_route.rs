@@ -28,4 +28,17 @@ pub fn index() -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp:
             .and(with_session())
             .and_then(book_handler::list_page))
         .or(test)
+        .or(chapters())
+}
+
+/// GET: /book/chapters/{1}
+pub fn chapters(
+) -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+    warp::get()
+        .and(warp::path("book"))
+        .and(warp::path("chapters"))
+        .and(warp::path::param())
+        .and(warp::path::end())
+        .and(with_session())
+        .and_then(book_handler::chapters)
 }

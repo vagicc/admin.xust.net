@@ -1,0 +1,139 @@
+{{#*inline "child"}}
+<div class="panel box-shadow-none content-header">
+    <div class="panel-body">
+        <div class="col-md-12">
+            <h3 class="animated fadeInLeft">{{book.name}}</h3>
+            <div class="row">
+                <ol class="animated fadeInDown breadcrumb col-md-2 col-sm-12 col-xs-12">
+                    <li><a href="/">首页</a></li>
+                    <li><a href="/book/list">书籍列表</a></li>
+
+                    <!--按钮-->
+                    <span class="hidden-md hidden-lg pull-right" id="search-btn"
+                        style="display: inline-block;cursor: pointer;">
+                        搜索
+                        <span class="caret"></span>
+                    </span>
+                </ol>
+                <!--搜索内容-->
+                <div class="col-md-10 col-sm-12 col-xs-12" id="search">
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12 top-20 padding-0">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-body">
+
+                <!-- 警告(提示) start -->
+
+                <!-- 警告(提示) end -->
+
+                <div class="col-md-12 " style="padding-bottom:20px;">
+                    <a href="javascript:history.back(-1);" class="right btn btn-gradient btn-default"
+                        style="margin-left:8px;">后退</a>
+                    <!-- <a href="" title="新增" class="right btn btn-gradient btn-info">新增书籍</a> -->
+                    <h4 style="padding-left:10px;">{{book.name}}<span style="font-size: 12px;"> ({{book.author}})</span>
+                    </h4>
+                </div>
+
+                <div class="responsive-table">
+                    <div class="col-md-3">
+                        <div class="panel">
+
+                            <div class="panel-body">
+                                <ul class="mini-timeline">
+                                    {{#each chapters}}
+                                    <li class="mini-timeline-highlight mini-timeline-success">
+                                        <div class="mini-timeline-panel">
+                                            <h5>{{title}}</h5>
+                                            <p>
+                                                <a href="#">正文</a>
+                                                <a href="/chapters/{{id}}" class="text-info">
+                                                    <i class="fa"></i>查看内容
+                                                    <span class="text-muted"></span>
+                                                </a>
+                                                |
+                                                <a href="/chapters/edit/{{id}}"><i class="fa fa-edit"></i> 修改
+                                                    <span class="text-muted"></span>
+                                                </a>
+                                                |
+                                                <a style="color: red;" href="/chapters/delete/{{id}}"
+                                                    onclick="return confirm('删除章节:{{title}}（ID：{{id}}');">
+                                                    <i class="fa fa-trash-o"></i>删除
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </li>
+                                    {{/each}}
+
+
+
+                                    <li class="mini-timeline-highlight">
+                                        <div class="mini-timeline-panel">
+                                            <h5 class="time">12:00</h5>
+                                            <p>Meeting with <a href="#">Clients</a></p>
+                                            <p>Meeting with <a href="#">正文</a>==<a href="#">修改</a></p>
+                                        </div>
+                                    </li>
+                                    <li class="mini-timeline-highlight mini-timeline-warning">
+                                        <div class="mini-timeline-panel">
+                                            <h5 class="time">15:00</h5>
+                                            <p>Breakdown the Personal PC</p>
+                                        </div>
+                                    </li>
+                                    <li class="mini-timeline-highlight mini-timeline-info">
+                                        <div class="mini-timeline-panel">
+                                            <h5 class="time">15:00</h5>
+                                            <p>Checking Server!</p>
+                                        </div>
+                                    </li>
+                                    <li class="mini-timeline-highlight mini-timeline-success">
+                                        <div class="mini-timeline-panel">
+                                            <h5 class="time">16:01</h5>
+                                            <p>Hacking The public wifi</p>
+                                        </div>
+                                    </li>
+                                    <li class="mini-timeline-highlight mini-timeline-danger">
+                                        <div class="mini-timeline-panel">
+                                            <h5 class="time">21:00</h5>
+                                            <p>Sleep!</p>
+                                        </div>
+                                    </li>
+                                    <li></li>
+                                    <li></li>
+                                    <li></li>
+                                    <li></li>
+                                    <li></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7 right">
+                        
+                       
+                        <div class="panel-body">
+                            <blockquote class="blockquote-reverse">
+                                <p>{{book.description}}</p>
+                                <footer>书籍 <cite title="Source Title">简介</cite></footer>
+                            </blockquote>
+                        </div>
+                        <div class="well well-sm">
+                            <h4>章节标题</h4>
+                            <p>  章节正文.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{{/inline}}
+{{> (lookup this "parent")}}

@@ -61,7 +61,10 @@
             <div class="panel-body">
                 <center>
                     <ul class="list-inline">
-                        <li>{{book.name}}</li>
+                        <li>
+                            <h3>{{book.name}}</h3>
+                            <span class="text-success" data-url="{{book.reptile_url}}">来源</span>
+                        </li>
 
                     </ul>
                 </center>
@@ -79,6 +82,7 @@
                                         <code>
                                             <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal" onclick="toggleMenu({{id}})">{{title}}</a>
                                         </code>
+                                        <a href="{{reptile_url}}" target="_blank" class="text-success">此章来源</a>
                                         <small>
                                             {{#if ../book.is_published}}
                                             {{else}}
@@ -243,6 +247,21 @@
         // alert('更改信息先');
         // $("#coinTopUpWithdrawalID").val(id);
     }
+
+    // 获取所有带有data-url属性的.text-success元素
+    var links = document.querySelectorAll('.text-success[data-url]');
+    // 为每个元素添加点击事件监听器
+    links.forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            // 阻止默认的链接跳转行为
+            event.preventDefault();
+            
+            // 使用data-url属性的值在新标签页打开链接
+            var url = this.getAttribute('data-url');
+            window.open(url, '_blank'); // '_blank'指定在新标签页打开
+        });
+    });
+
 </script>
 
 {{/inline}}

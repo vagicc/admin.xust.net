@@ -84,8 +84,8 @@
 									<input type="checkbox" class="icheck gou" name="checkbox1" />
 								</th>
 								<th>书籍名</th>
-								<th>作者</th>
-								<th>是否已发布</th>
+								<th>SEO关键字</th>
+								<th width="30">完结</th>
 
 								<th>操作</th>
 							</tr>
@@ -99,41 +99,34 @@
 									<input type="checkbox" class="icheck none" name="ids" value="{{id}}" />
 								</td>
 								<td>
-									<b class="hidden-md hidden-lg">书籍名：</b>{{name}}
-								</td>
-								<td>
-									<b class="hidden-md hidden-lg">作者：</b>{{author}}
-								</td>
-								<td>
-									<b class="hidden-md hidden-lg">是否已发布：</b>
-									{{#if is_published}}
-									已发布
-									{{else}}
-									未发布
-									<a href="{{../base_url}}reptile/zhongh/{{id}}" target="_blank">
-										<i class="fa "></i>去发布
-										<span class="text-muted"></span>
-									</a>
-									{{/if}}
 
+									<b class="hidden-md hidden-lg">书籍名：</b>
+									<p>{{name}}</p>
+									<footer>{{author}}</footer>
 								</td>
 								<td>
-									<a href="{{../base_url}}reptile/zhonghuadiancang/book/{{id}}"
-										style="color:#27C24C;">
-										<i class="fa fa-plus-square-o"></i>查看章节
-										<span class="text-muted"></span>
-									</a>
-									|
-									{{#if is_published}}
-									<!-- 已发布 -->
+									<b class="hidden-md hidden-lg">SEO关键字：</b>{{seo_keywords}}
+								</td>
+								<td>
+									<b class="hidden-md hidden-lg">完结：</b>
+									{{#if finish}}
+									<span class="label label-info">完本</span>
 									{{else}}
-									<a href="{{../base_url}}reptile/zhonghuadiancang/publish/{{id}}"
-										onclick="return confirm('直接发布整本《{{name}}》书？？');" target="_blank">
-										<i class="fa fa-edit"></i>整本发布
+									<span class="label label-success">未结</span>
+									{{/if}}
+								</td>
+								<td>
+									<a href="/book/chapters/{{id}}" class="text-info">
+										<i class="fa"></i>查看章节
 										<span class="text-muted"></span>
 									</a>
 									|
-									{{/if}}
+
+									|
+									<br>
+									<a href="{{../base_url}}menus/edit/{{id}}"><i class="fa fa-edit"></i> 修改
+										<span class="text-muted"></span>
+									</a> |
 									<a style="color: red;" href="" onclick="return confirm('是否要删除ID:（用途：）？？');">
 										<i class="fa fa-trash-o"></i>删除
 									</a>

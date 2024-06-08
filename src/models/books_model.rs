@@ -195,9 +195,24 @@ pub fn get_book(book_name: String)-> Option<Books> {
     match result {
         Ok(row) => Some(row),
         Err(err) => {
-            log::debug!("get_admin查无数据：{}", err);
+            log::debug!("get_book查无数据：{}", err);
             None
         }
     }
 }
 
+pub fn find_book(book_id: i32)-> Option<Books> {
+    let query = books.find(book_id);
+    let sql = diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string();
+    log::debug!("find_book查询SQL：{:?}", sql);
+    let mut connection = get_connection();
+    let result = query.first::<Books>(&mut connection);
+    match result {
+        Ok(row) => Some(row),
+        Err(err) => {
+            log::debug!("find_book查无数据：{}", err);
+            None
+        }
+    }
+}
+ 

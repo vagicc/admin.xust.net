@@ -115,7 +115,7 @@
 								</td>
 								<td>
 									<a href="{{../base_url}}reptile/zhonghuadiancang/book/{{id}}"
-										style="color:#27C24C;">
+									class="text-info">
 										<i class="fa fa-plus-square-o"></i>查看章节
 										<span class="text-muted"></span>
 									</a>
@@ -124,14 +124,20 @@
 									<!-- 已发布 -->
 									{{else}}
 									<a href="{{../base_url}}reptile/zhonghuadiancang/publish/{{id}}"
-										onclick="return confirm('直接发布整本《{{name}}》书？？');" target="_blank">
-										<i class="fa fa-edit"></i>整本发布
+										onclick="return confirm('直接发布整本《{{name}}》书？？');" class="text-warning" target="_blank">
+										<i class="fa  "></i>整本发布
 										<span class="text-muted"></span>
 									</a>
 									|
 									{{/if}}
 									<a style="color: red;" href="/reptile/zhonghuadiancang/del/{{id}}" onclick="return confirm('是否要删除：<<{{name}}>>（ID：{{id}}）？？');">
 										<i class="fa fa-trash-o"></i>删除
+									</a>
+									|
+									<a href="{{reptile_url}}"
+									class="text-success" target="_blank">
+										<i class="fa fa-plus-square-o"></i>来源
+										<span class="text-muted"></span>
 									</a>
 									|
 									<a href="javascript:void(0)" data-toggle="modal" data-target="#myModal"

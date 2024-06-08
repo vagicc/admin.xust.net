@@ -70,13 +70,33 @@ impl NewBookChapters {
     }
 }
 
+//更新下章ID
 pub fn update_next(pky: i32, next_id: i32) {
     let query = diesel::update(book_chapters.find(pky)).set(next.eq(next_id));
-    log::error!(
+    log::debug!(
         "book_chapters表更新数据SQL：{:?}",
         diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
     );
 
     let mut conn = get_connection();
     let k = query.execute(&mut conn);
+}
+
+//查找本书籍所有章节
+pub fn get_book_all_chapters(bookid: i32) -> Option<Vec<BookChapters>> {
+    let query = book_chapters.filter(book_id.eq(bookid));
+    log::debug!(
+        "get_book_all_chapters数据SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+
+    let mut connection = get_connection();
+
+    match query.get_results::<BookChapters>(&mut connection) {
+        Ok(list) => Some(list),
+        Err(err) => {
+            log::debug!("get_book_all_chapters查无数据：{}", err);
+            None
+        }
+    }
 }
