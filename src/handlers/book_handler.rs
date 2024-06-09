@@ -12,6 +12,7 @@ pub struct GetQuery {
     pub book_name: Option<String>,   //书名
     pub book_author: Option<String>, //作者
     pub c_id: Option<i32>,           //分类ID
+    pub finish:Option<i8>,    //是否已完本，0为未选择，1为完本，2为未结
 }
 
 //书籍列表

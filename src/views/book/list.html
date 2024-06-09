@@ -29,17 +29,20 @@
 								<input type="text" name="book_author" value="{{get.book_author}}" placeholder="作者"
 									style="height:35px;width:100px">
 							</li>
+							
 							<!-- <li>
-                                <label>货号：</label>
-                                <input type="text" name="goods_sn" value=" " placeholder="商品货号"
-                                    style="height:35px;width:100px">
-                            </li> -->
-							<li>
 								<label>分类：</label>
 								<select name="c_id" style="height:35px;width:180px">
 									<option value="0">请选择</option>
 									<option value="1" {{#if (eq get.c_id 1)}}selected{{/if}}>医书</option>
 									<option value="2">未发布</option>
+								</select>
+							</li> -->
+							<li>
+								<select name="finish" style="height:35px;width:110px">
+									<option value="0">是否完本</option>
+									<option value="1" {{#if (eq get.finish 1)}}selected{{/if}}>完本</option>
+									<option value="2" {{#if (eq get.finish 2)}}selected{{/if}}>未结</option>
 								</select>
 							</li>
 
@@ -76,7 +79,7 @@
 				</div>
 
 				<div class="responsive-table">
-					<form method="post" action="{{base_url}}role/delete" onsubmit="return checkboxDelete()"">
+					<form method="post" action="/book/delete" onsubmit="return checkboxDelete()"">
 						<table class=" table table-striped table-bordered" width="100%" cellspacing="0">
 						<thead>
 							<tr>
@@ -86,6 +89,7 @@
 								<th>书籍名</th>
 								<th>SEO关键字</th>
 								<th width="30">完结</th>
+								<th>创建日期</th>
 
 								<th>操作</th>
 							</tr>
@@ -110,10 +114,13 @@
 								<td>
 									<b class="hidden-md hidden-lg">完结：</b>
 									{{#if finish}}
-									<span class="label label-info">完本</span>
+									<span class="label label-info">完本</span> 
 									{{else}}
 									<span class="label label-success">未结</span>
 									{{/if}}
+								</td>
+								<td>
+									{{create_time}}
 								</td>
 								<td>
 									<a href="/book/chapters/{{id}}" class="text-info">
@@ -124,10 +131,10 @@
 
 									|
 									<br>
-									<a href="{{../base_url}}menus/edit/{{id}}"><i class="fa fa-edit"></i> 修改
+									<a href="/book/edit/{{id}}"><i class="fa fa-edit"></i> 修改
 										<span class="text-muted"></span>
 									</a> |
-									<a style="color: red;" href="" onclick="return confirm('是否要删除ID:（用途：）？？');">
+									<a style="color: red;" href="/book/delete/{{id}}" onclick="return confirm('是否要删除：{{name}}（ID:{{id}}）？？');">
 										<i class="fa fa-trash-o"></i>删除
 									</a>
 								</td>

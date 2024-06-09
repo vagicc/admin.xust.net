@@ -149,6 +149,12 @@ pub fn list_page(
             query = query.filter(category_id.eq(c_id));
             query_count = query_count.filter(category_id.eq(c_id));
         }
+        //是否已完本
+        if let Some(finish_whe) = params.finish.filter(|f| *f > 0) {
+            let finish_whe = if finish_whe == 1 { true } else { false };
+            query = query.filter(finish.eq(finish_whe));
+            query_count = query_count.filter(finish.eq(finish_whe));
+        }
     }
 
     let query_count = query_count.count();
@@ -186,7 +192,7 @@ pub fn list_page(
 }
 
 ///通过书名取得书籍信息
-pub fn get_book(book_name: String)-> Option<Books> {
+pub fn get_book(book_name: String) -> Option<Books> {
     let query = books.filter(name.eq(book_name));
     let sql = diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string();
     log::debug!("get_book查询SQL：{:?}", sql);
@@ -201,7 +207,7 @@ pub fn get_book(book_name: String)-> Option<Books> {
     }
 }
 
-pub fn find_book(book_id: i32)-> Option<Books> {
+pub fn find_book(book_id: i32) -> Option<Books> {
     let query = books.find(book_id);
     let sql = diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string();
     log::debug!("find_book查询SQL：{:?}", sql);
@@ -215,4 +221,3 @@ pub fn find_book(book_id: i32)-> Option<Books> {
         }
     }
 }
- 
