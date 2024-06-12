@@ -45,6 +45,7 @@ pub fn all_routes(
         .or(demo)
         .or(check)
         .or(book)
-        .or(reptile);
+        .or(reptile)
+        .recover(crate::session::inaccessible);
     routes
 }
