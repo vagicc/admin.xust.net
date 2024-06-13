@@ -9,11 +9,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Queryable, Serialize, Deserialize)]
 pub struct BookChapters {
     pub id: i32,
-    pub book_id: Option<i32>,
+    pub book_id: i32,
     pub book_name: Option<String>,
     pub author: Option<String>,
     pub title: String,
-    pub content: Option<String>,
+    // pub content: Option<String>,  //独立到表：book_chapters_content
     pub visit: i64,
     pub previous: Option<i32>,
     pub next: Option<i32>,
@@ -29,11 +29,11 @@ pub struct BookChapters {
 #[derive(Debug, Clone, Insertable, AsChangeset)]
 #[diesel(table_name = book_chapters)]
 pub struct NewBookChapters {
-    pub book_id: Option<i32>,
+    pub book_id: i32,
     pub book_name: Option<String>,
     pub author: Option<String>,
     pub title: String,
-    pub content: Option<String>,
+    // pub content: Option<String>,
     pub visit: i64,
     pub previous: Option<i32>,
     pub next: Option<i32>,
@@ -99,4 +99,96 @@ pub fn get_book_all_chapters(bookid: i32) -> Option<Vec<BookChapters>> {
             None
         }
     }
+}
+
+/// 取得列表数据
+/// page: Option<u32>  第几页
+/// per: Option<u32>   每页多少条数据,默认为50
+/// 返回（总条数：i64,数据数组，分页html)
+pub fn list_page(
+    page: Option<u32>,
+    per: Option<u32>,
+    whe: Option<crate::handlers::book_chapters_h::GetQuery>,
+) -> (i64, Vec<BookChapters>, String) {
+    let mut limit: i64 = 50; //每页取几条数据
+    let mut offset: i64 = 0; //从第0条开始
+
+    if !per.is_none() {
+        limit = per.unwrap() as i64;
+    }
+
+    if !page.is_none() && page.unwrap() > 1 {
+        offset = ((page.unwrap() as i64) - 1) * limit;
+    }
+
+    let mut query = book_chapters.into_boxed();
+    let mut query_count = book_chapters.into_boxed();
+
+    if let Some(params) = whe {
+        //章节标题
+        if let Some(c_title) = params.title.filter(|s| !s.is_empty()) {
+            let title_like = format!("%{}%", c_title);
+            query = query.filter(title.like(title_like.clone()));
+            query_count = query_count.filter(title.like(title_like));
+        }
+        //书籍ID
+        if let Some(b_id) = params.book_id.filter(|c| *c > 0) {
+            query = query.filter(book_id.eq(b_id));
+            query_count = query_count.filter(book_id.eq(b_id));
+        }
+        //书名
+        if let Some(bookname) = params.book_name.filter(|bn| !bn.is_empty()) {
+            let name_like = format!("%{}%", bookname);
+            query = query.filter(book_name.like(name_like.clone()));
+            query_count = query_count.filter(book_name.like(name_like));
+        }
+        //作者
+        if let Some(book_author) = params.book_author.filter(|s| !s.is_empty()) {
+            let author_like = format!("%{}%", book_author);
+            query = query.filter(author.like(author_like.clone()));
+            query_count = query_count.filter(author.like(author_like));
+        }
+        //是否已发布
+        if let Some(finish_whe) = params.publish.filter(|f| *f > 0) {
+            let finish_whe = if finish_whe == 1 { true } else { false };
+            query = query.filter(publish.eq(finish_whe));
+            query_count = query_count.filter(publish.eq(finish_whe));
+        }
+    }
+
+    let query_count = query_count.count();
+    log::warn!(
+        "book_chapters分页数量查询SQL：{:#?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query_count).to_string()
+    );
+
+    let mut conn = get_connection();
+    let count: i64 = query_count
+        .get_result(&mut conn)
+        .expect("book_chapters分页数量查询出错"); //查询总条数
+
+    let mut pages = String::new();
+    let data_null: Vec<BookChapters> = Vec::new();
+    if count <= 0 {
+        // return (count, data_null, pages);
+    }
+
+    let query = query
+        .order_by(id.desc())
+        .limit(limit) //取10条数据
+        .offset(offset); //从第0条开始;
+
+    log::warn!(
+        "book_chapters分页查询SQL：{:#?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+
+    let list = query
+        .get_results::<BookChapters>(&mut conn)
+        .unwrap_or(data_null);
+
+    pages =
+        crate::pager::default_full("book/chapters/list", count, page.unwrap_or(1), limit as u32);
+
+    (count, list, pages)
 }

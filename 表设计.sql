@@ -44,7 +44,7 @@ CREATE TABLE "book_chapters"(
     "book_name" CHARACTER VARYING(255) DEFAULT NULL,
     "author" CHARACTER VARYING(180) DEFAULT NULL,
     "title" CHARACTER VARYING(255) NOT NULL,
-    "content" TEXT DEFAULT NULL,
+    -- "content" TEXT DEFAULT NULL,
     "visit" bigint NOT NULL DEFAULT 0,
     "previous" INTEGER DEFAULT NULL,
     "next" INTEGER DEFAULT NULL,
@@ -65,7 +65,7 @@ COMMENT ON COLUMN book_chapters.book_id IS '书籍ID';
 COMMENT ON COLUMN book_chapters.book_name IS '书籍名称';
 COMMENT ON COLUMN book_chapters.author IS '作者';
 COMMENT ON COLUMN book_chapters.title IS '章节标题';
-COMMENT ON COLUMN book_chapters.content IS '本章内容';
+-- COMMENT ON COLUMN book_chapters.content IS '本章内容';
 COMMENT ON COLUMN book_chapters.visit IS '阅读次数';
 COMMENT ON COLUMN book_chapters.previous IS '上一章（ID）';
 COMMENT ON COLUMN book_chapters.next IS '下一章（ID）';
@@ -76,6 +76,19 @@ COMMENT ON COLUMN book_chapters.seo_description IS 'SEO描述';
 COMMENT ON COLUMN book_chapters.create_id IS '创建者ID';
 COMMENT ON COLUMN book_chapters.create IS '创建时间( Unix 时间戳)';
 COMMENT ON COLUMN book_chapters.last_time IS '最后修改时间';
+
+-- 书章节正文表
+CREATE TABLE "book_chapters_content"(
+    "chapter_id" INTEGER NOT NULL,
+    "content" TEXT NOT NULL,
+    "last_time" TIMESTAMP WITHOUT time ZONE DEFAULT clock_timestamp(),
+    PRIMARY KEY ("chapter_id"),
+    FOREIGN KEY ("chapter_id") REFERENCES "book_chapters" ("id")
+);
+COMMENT ON TABLE book_chapters_content IS '书章节正文表';
+COMMENT ON COLUMN book_chapters_content.chapter_id IS '章节ID';
+COMMENT ON COLUMN book_chapters_content.content IS '本章内容';
+COMMENT ON COLUMN book_chapters_content.last_time IS '最后修改时间';
 
 -- 书分类表
 CREATE TABLE book_category(

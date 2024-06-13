@@ -43,14 +43,13 @@ diesel::table! {
 diesel::table! {
     book_chapters (id) {
         id -> Int4,
-        book_id -> Nullable<Int4>,
+        book_id -> Int4,
         #[max_length = 255]
         book_name -> Nullable<Varchar>,
         #[max_length = 180]
         author -> Nullable<Varchar>,
         #[max_length = 255]
         title -> Varchar,
-        content -> Nullable<Text>,
         visit -> Int8,
         previous -> Nullable<Int4>,
         next -> Nullable<Int4>,
@@ -63,6 +62,14 @@ diesel::table! {
         seo_description -> Nullable<Varchar>,
         create_id -> Nullable<Int4>,
         create -> Nullable<Int8>,
+        last_time -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    book_chapters_content (chapter_id) {
+        chapter_id -> Int4,
+        content -> Text,
         last_time -> Nullable<Timestamp>,
     }
 }
@@ -215,10 +222,13 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(book_chapters_content -> book_chapters (chapter_id));
+
 diesel::allow_tables_to_appear_in_same_query!(
     admins,
     book_category,
     book_chapters,
+    book_chapters_content,
     books,
     ci_sessions,
     menus,

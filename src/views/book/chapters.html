@@ -57,7 +57,7 @@
                                             <h5>{{title}}&nbsp;<span style="font-size: 12px;"> </span></h5>
                                             <p class="right">
                                                 <input type="hidden" name="chapter_name_{{id}}" value="{{title}}">
-                                                <input type="hidden" name="chapter_content_{{id}}" value="{{content}}">
+                                                <!-- <input type="hidden" name="chapter_content_{{id}}" value="{{content}}"> -->
                                                 <a href="/book/chapters/{{book_id}}#chapters-title" class="text-info"
                                                     onclick="showContent({{id}})">
                                                     <i class="fa"></i>查看内容
@@ -135,24 +135,33 @@
         $("#chapters-title").html("");
         $("#chapters-content").html("");
         var book_name = $('input[name="chapter_name_' + id + '"]').val();
-        var book_description = $('input[name="chapter_content_' + id + '"]').val();
-        if (book_description.trim().length < 0) {
-            alert("章节正文怎么为空呢？");
-        } else {
-            // alert(book_description);
-        }
         $("#chapters-title").html(book_name);
 
-        // 按行分割文本，并使用jQuery的each方法遍历每一行
-        $.each(book_description.split('\n'), function (index, line) {
-            // 过滤掉空行或只含空白的行
-            if (line.trim() !== '') {
-                // 包装每行文本为<p>标签，并添加到container中
-                $('#chapters-content').append('<p>' + line + '</p>');
-            }
-        });
+        $.get("/book/chapters/content/" + id)
+            .done(function (re) {
+                if (re.status == 200) {
+                    var book_description = re.data.content;
+                    // 处理book_description
+                    // 按行分割文本，并使用jQuery的each方法遍历每一行
+                    $.each(book_description.split('\n'), function (index, line) {
+                        // 过滤掉空行或只含空白的行
+                        if (line.trim() !== '') {
+                            // 包装每行文本为<p>标签，并添加到container中
+                            $('#chapters-content').append('<p>' + line + '</p>');
+                        }
+                    });
+                } else {
+                    console.log('请求章节正文出错');
+                    console.log(re);
+                    alert('请求章节正文出错');
+                }
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                // 处理错误情况
+                console.log('请求失败：' + textStatus, errorThrown);
+                alert('请求失败');
+            });
 
-        // $("#chapters-content").html(book_description);
     }
 </script>
 

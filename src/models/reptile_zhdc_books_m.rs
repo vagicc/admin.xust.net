@@ -212,6 +212,7 @@ pub fn publish_book(book_id: i32, publish_all: bool, chapter_id: Option<i32>) ->
             //================================start===================
 
             //发布所有的章节
+            use crate::models::book_chapters_content_m;
             use crate::models::book_chapters_m;
             use crate::models::reptile_zhdc_chapters_m;
             let chapters = reptile_zhdc_chapters_m::get_book_chapters(book_id);
@@ -227,11 +228,11 @@ pub fn publish_book(book_id: i32, publish_all: bool, chapter_id: Option<i32>) ->
                     }
                 }
                 let new_chapter = book_chapters_m::NewBookChapters {
-                    book_id: Some(new_book_id),
+                    book_id: new_book_id,
                     book_name: chapter.book_name,
                     author: book.author.clone(),
                     title: chapter.title,
-                    content: chapter.content,
+                    // content: chapter.content,  //这里要写到新的表“”
                     visit: 0,
                     previous: Some(previous), //上一章（ID）
                     next: None,               //下一章（ID）
@@ -244,6 +245,16 @@ pub fn publish_book(book_id: i32, publish_all: bool, chapter_id: Option<i32>) ->
                     last_time: None,
                 };
                 let insert_id = new_chapter.insert();
+                if let Some(content) = chapter.content {
+                    if !content.is_empty() {
+                        let new_content = book_chapters_content_m::BookChaptersContent {
+                            chapter_id: insert_id,
+                            content: content,
+                            last_time: None,
+                        };
+                        let _ = new_content.insert();
+                    }
+                }
                 if previous > 0 {
                     //更新下一章。
                     book_chapters_m::update_next(previous, insert_id);
