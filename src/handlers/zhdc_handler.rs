@@ -11,7 +11,7 @@ use warp::{Rejection, Reply};
 //GET: /reptile/zhonghuadiancang
 pub async fn list_page(
     page: u32,
-    get: GetQuery,
+    get: reptile_zhdc_books_m::GetQuery,
     session: Session,
 ) -> std::result::Result<impl Reply, Rejection> {
     log::debug!("GET: /reptile/zhonghuadiancang");
@@ -33,13 +33,6 @@ pub async fn list_page(
     let html = view("zhdc/list.html", data, session);
 
     Ok(warp::reply::html(html)) //直接返回html
-}
-
-// GET查询条件
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct GetQuery {
-    pub book_name: Option<String>,  //书名
-    pub is_published: Option<bool>, //是否已推送
 }
 
 /* 响应： new_html*/
