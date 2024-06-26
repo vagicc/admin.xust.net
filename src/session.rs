@@ -6,9 +6,9 @@ use warp::Filter;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Session {
-    pub admin: admins_model::Admins,    
-    pub ip: Option<std::net::SocketAddr>, 
-    pub url_path: String,     //处理后相对URL路径,不带参数与页数
+    pub admin: admins_model::Admins,
+    pub ip: Option<std::net::SocketAddr>,
+    pub url_path: String, //处理后相对URL路径,不带参数与页数
 }
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
@@ -75,10 +75,12 @@ impl warp::reject::Reject for NoRight {}
 
 ///未登录的全跳转到此处理no_login改 inaccessible  ,除了单单跳转到登录,还可以跳转到提示页面
 pub async fn inaccessible(reject: warp::Rejection) -> Result<impl warp::Reply, warp::Rejection> {
-    log::warn!("用户未登录,直接跳转到登录页");
+    // log::warn!("用户未登录,直接跳转到登录页");
 
     // let ka = warp::reject::not_found(); //找不页面  missing_cookie
     // let ka=warp::reject::missing_cookie(); //找不页面  missing_cookie
+    log::error!("处理跳转：{:#?}", reject);
+
     if reject.is_not_found() {
         log::warn!("找不到页面----!!");
         Ok(warp::redirect::see_other(warp::http::Uri::from_static(
@@ -112,8 +114,16 @@ pub async fn inaccessible(reject: warp::Rejection) -> Result<impl warp::Reply, w
         Ok(warp::redirect::see_other(warp::http::Uri::from_static(
             "/login",
         )))
+    } else if let Some(e) = reject.find::<warp::reject::MethodNotAllowed>() {
+        //表示请求被拒绝。当一个请求的方法不被允许时
+        log::error!(
+            "表示请求被拒绝。当一个请求的方法不被允许时：通常是访问了不存在的url:{:#?}",
+            e
+        );
+        Ok(warp::redirect::see_other(warp::http::Uri::from_static("/")))
     } else {
         log::warn!("其他情况^^^^^");
+
         Ok(warp::redirect::see_other(warp::http::Uri::from_static(
             "/login",
         )))
