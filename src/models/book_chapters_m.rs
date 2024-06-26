@@ -101,6 +101,17 @@ pub fn get_book_all_chapters(bookid: i32) -> Option<Vec<BookChapters>> {
     }
 }
 
+
+// GET查询条件
+#[derive(Debug, Clone, serde_derive::Deserialize, serde_derive::Serialize)]
+pub struct GetQuery {
+    pub title: Option<String>, //章节标题
+    pub book_id: Option<i32>,
+    pub book_name: Option<String>,   //书名
+    pub book_author: Option<String>, //作者
+    pub publish: Option<i8>,         //是否已发布，0为未选择，1为发布，2为未发布
+}
+
 /// 取得列表数据
 /// page: Option<u32>  第几页
 /// per: Option<u32>   每页多少条数据,默认为50
@@ -108,7 +119,7 @@ pub fn get_book_all_chapters(bookid: i32) -> Option<Vec<BookChapters>> {
 pub fn list_page(
     page: Option<u32>,
     per: Option<u32>,
-    whe: Option<crate::handlers::book_chapters_h::GetQuery>,
+    whe: Option<GetQuery>,
 ) -> (i64, Vec<BookChapters>, String) {
     let mut limit: i64 = 50; //每页取几条数据
     let mut offset: i64 = 0; //从第0条开始

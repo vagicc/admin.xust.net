@@ -21,6 +21,66 @@ diesel::table! {
 }
 
 diesel::table! {
+    article (id) {
+        id -> Int4,
+        #[max_length = 180]
+        title -> Varchar,
+        #[max_length = 255]
+        cover -> Nullable<Varchar>,
+        #[max_length = 255]
+        summary -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_title -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_keywords -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_description -> Nullable<Varchar>,
+        content_id -> Int4,
+        category_id -> Nullable<Int4>,
+        #[max_length = 20]
+        category -> Nullable<Varchar>,
+        columns_id -> Int4,
+        available -> Nullable<Int2>,
+        nav_id -> Nullable<Int4>,
+        visit -> Int8,
+        collect -> Int8,
+        share -> Int8,
+        user_id -> Nullable<Int4>,
+        #[max_length = 50]
+        username -> Nullable<Varchar>,
+        create -> Nullable<Int8>,
+        last_time -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    article_category (id) {
+        id -> Int4,
+        #[max_length = 20]
+        category -> Varchar,
+        #[max_length = 255]
+        seo_title -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_keywords -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_description -> Nullable<Varchar>,
+        show -> Int2,
+        order_by -> Nullable<Int2>,
+        modify_id -> Nullable<Int4>,
+        modify_time -> Nullable<Timestamp>,
+        create_id -> Nullable<Int4>,
+        create_time -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    article_content (id) {
+        id -> Int4,
+        content -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     book_category (id) {
         id -> Int4,
         #[max_length = 20]
@@ -111,6 +171,34 @@ diesel::table! {
         ip_address -> Inet,
         timestamp -> Timestamptz,
         data -> Bytea,
+    }
+}
+
+diesel::table! {
+    column (id) {
+        id -> Int4,
+        #[max_length = 50]
+        title -> Varchar,
+        #[max_length = 80]
+        subhead -> Varchar,
+        #[max_length = 255]
+        surface_plot -> Nullable<Varchar>,
+        #[max_length = 50]
+        author -> Nullable<Varchar>,
+        excerpt -> Nullable<Text>,
+        price -> Nullable<Money>,
+        visit -> Int8,
+        collect -> Int8,
+        amount -> Nullable<Int4>,
+        complete -> Int4,
+        #[max_length = 255]
+        seo_title -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_keywords -> Nullable<Varchar>,
+        #[max_length = 255]
+        seo_description -> Nullable<Varchar>,
+        create_id -> Nullable<Int4>,
+        create_time -> Nullable<Timestamp>,
     }
 }
 
@@ -226,11 +314,15 @@ diesel::joinable!(book_chapters_content -> book_chapters (chapter_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     admins,
+    article,
+    article_category,
+    article_content,
     book_category,
     book_chapters,
     book_chapters_content,
     books,
     ci_sessions,
+    column,
     menus,
     record,
     reptile_zhdc_books,

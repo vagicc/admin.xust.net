@@ -45,7 +45,26 @@ impl NewAdmin {
     }
 }
 
-pub fn edit(pky: i32, post: &crate::handlers::admins_handler::AdminPost) -> Option<Admins> {
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct AdminPost {
+    pub username: String,
+    pub password: String,
+    pub email: String,
+    pub mobile: String,
+    pub role: i32,
+    pub status: i64,
+}
+impl AdminPost {
+    pub fn validate(&self) -> Result<Self, &'static str> {
+        if self.username.is_empty() {
+            return Err("登录必填");
+        }
+        Ok(self.clone())
+    }
+}
+
+pub fn edit(pky: i32, post: &AdminPost) -> Option<Admins> {
     let mut conn = get_connection();
 
     if post.password.is_empty() {

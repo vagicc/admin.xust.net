@@ -103,6 +103,15 @@ impl NewBooks {
     }
 }
 
+// GET查询条件
+#[derive(Debug, Clone, serde_derive::Deserialize, serde_derive::Serialize)]
+pub struct GetQuery {
+    pub book_name: Option<String>,   //书名
+    pub book_author: Option<String>, //作者
+    pub c_id: Option<i32>,           //分类ID
+    pub finish:Option<i8>,    //是否已完本，0为未选择，1为完本，2为未结
+}
+
 /// 取得列表数据
 /// page: Option<u32>  第几页
 /// per: Option<u32>   每页多少条数据,默认为50
@@ -110,7 +119,7 @@ impl NewBooks {
 pub fn list_page(
     page: Option<u32>,
     per: Option<u32>,
-    whe: Option<crate::handlers::book_handler::GetQuery>,
+    whe: Option<GetQuery>,
 ) -> (i64, Vec<Books>, String) {
     let mut limit: i64 = 50; //每页取几条数据
     let mut offset: i64 = 0; //从第0条开始

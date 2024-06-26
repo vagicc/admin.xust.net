@@ -195,4 +195,14 @@ COMMENT ON COLUMN record.ip IS '操作IP';
 
 COMMENT ON COLUMN record.record_time IS '操作时间';
  
+-- 创建当年的日志分区表
+CREATE TABLE record_2022 PARTITION OF record FOR
+VALUES
+FROM
+    ('2022-01-01') TO ('2023-01-01');
+
+-- 创建索引
+CREATE INDEX idx_record_2022_rtime ON record_2022 (record_time);
+
+CREATE INDEX idx_record_2022_user_id ON record_2022 (user_id);
 -- 日志表 end

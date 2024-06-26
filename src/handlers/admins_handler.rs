@@ -32,26 +32,9 @@ pub async fn create_html(session: crate::session::Session) -> Result<impl Reply,
     Ok(warp::reply::html(html)) //直接返回html
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
-pub struct AdminPost {
-    pub username: String,
-    pub password: String,
-    pub email: String,
-    pub mobile: String,
-    pub role: i32,
-    pub status: i64,
-}
-impl AdminPost {
-    pub fn validate(&self) -> Result<Self, &'static str> {
-        if self.username.is_empty() {
-            return Err("登录必填");
-        }
-        Ok(self.clone())
-    }
-}
 
 pub async fn do_new(
-    form: AdminPost,
+    form: admins_model::AdminPost,
     session: crate::session::Session,
 ) -> Result<impl Reply, Rejection> {
     match form.validate() {
@@ -113,7 +96,7 @@ pub async fn edit(id: i32, session: crate::session::Session) -> Result<impl Repl
 
 pub async fn do_edit(
     id: i32,
-    form: AdminPost,
+    form: admins_model::AdminPost,
     session: crate::session::Session,
 ) -> Result<impl Reply, Rejection> {
     match form.validate() {

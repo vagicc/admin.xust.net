@@ -1,6 +1,7 @@
 use crate::handlers::book_chapters_h;
 use crate::session::with_session;
 use warp::Filter;
+use crate::models::book_chapters_m::GetQuery;
 
 /// GET: /book/chapters/list/{1}
 pub fn list() -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
@@ -8,7 +9,7 @@ pub fn list() -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp::
         .and(warp::path("book"))
         .and(warp::path("chapters"))
         .and(warp::path("list"))
-        .and(warp::query::<book_chapters_h::GetQuery>())
+        .and(warp::query::<GetQuery>())
         .and(warp::path::end())
         .and(with_session())
         .and_then(|get, session| async { book_chapters_h::list_page(1, get, session).await })
@@ -17,7 +18,7 @@ pub fn list() -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp::
             .and(warp::path("chapters"))
             .and(warp::path("list"))
             .and(warp::path::param())
-            .and(warp::query::<book_chapters_h::GetQuery>())
+            .and(warp::query::<GetQuery>())
             .and(warp::path::end())
             .and(with_session())
             .and_then(book_chapters_h::list_page))

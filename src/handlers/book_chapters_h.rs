@@ -7,21 +7,11 @@ use serde_derive::{Deserialize, Serialize};
 use serde_json::value::Map;
 use warp::{Rejection, Reply};
 
-// GET查询条件
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct GetQuery {
-    pub title: Option<String>, //章节标题
-    pub book_id: Option<i32>,
-    pub book_name: Option<String>,   //书名
-    pub book_author: Option<String>, //作者
-    pub publish: Option<i8>,         //是否已发布，0为未选择，1为发布，2为未发布
-}
-
 //书籍章节列表
 //响应GET: /book/chapters/list/{1}
 pub async fn list_page(
     page: u32,
-    get: GetQuery,
+    get: book_chapters_m::GetQuery,
     session: Session,
 ) -> std::result::Result<impl Reply, Rejection> {
     log::debug!("GET: /book/chapters/list");
