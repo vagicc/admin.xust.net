@@ -15,7 +15,6 @@ pub struct Article {
     pub seo_title: Option<String>,
     pub seo_keywords: Option<String>,
     pub seo_description: Option<String>,
-    pub content_id: i32,
     pub category_id: Option<i32>,
     pub category: Option<String>,
     pub columns_id: i32,
@@ -105,7 +104,7 @@ pub fn article_list(page: Option<u32>, per: Option<u32>) -> (i64, Vec<Article>, 
     }
 
     let query = article
-        .order_by(last_time.desc())
+        .order_by(id.desc())
         .limit(limit)
         .offset(offset);
     log::debug!(

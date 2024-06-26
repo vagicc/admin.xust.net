@@ -7,7 +7,6 @@ CREATE TABLE article(
     "seo_title" CHARACTER VARYING(255) DEFAULT NULL,
     "seo_keywords" CHARACTER VARYING(255) DEFAULT NULL,
     "seo_description" CHARACTER VARYING(255) DEFAULT NULL,
-    "content_id" INTEGER NOT NULL,
     "category_id" INTEGER DEFAULT NULL,
     "category" CHARACTER VARYING(20) DEFAULT NULL,
     "columns_id" INTEGER NOT NULL DEFAULT 0,
@@ -33,7 +32,6 @@ COMMENT ON COLUMN article.summary IS '文章摘要';
 COMMENT ON COLUMN article.seo_title IS 'SEO标题';
 COMMENT ON COLUMN article.seo_keywords IS 'SEO关键词';
 COMMENT ON COLUMN article.seo_description IS 'SEO描述';
-COMMENT ON COLUMN article.content_id IS '内容ID';
 COMMENT ON COLUMN article.category_id IS '文章分类ID';
 COMMENT ON COLUMN article.category IS '分类名，对应article_category表';
 COMMENT ON COLUMN article.columns_id IS '专栏ID，0不属于任何专栏';
@@ -49,11 +47,14 @@ COMMENT ON COLUMN article.last_time IS '最后修改时间';
 
 -- 文章内容表
 CREATE TABLE article_content(
-    "id" SERIAL PRIMARY KEY,
-    "content" TEXT DEFAULT NULL
+    "article_id" INTEGER NOT NULL,
+    "content" TEXT NOT NULL,
+    "last_time" TIMESTAMP WITHOUT time ZONE DEFAULT clock_timestamp(),
+    PRIMARY KEY ("article_id"),
+    FOREIGN KEY ("article_id") REFERENCES "article" ("id")
 );
 COMMENT ON TABLE article_content IS '文章内容表';
-COMMENT ON COLUMN article_content.id IS '文章内容ID';
+COMMENT ON COLUMN article_content.article_id IS '文章ID';
 COMMENT ON COLUMN article_content.content IS '文章内容';
 
 -- 文章分类表

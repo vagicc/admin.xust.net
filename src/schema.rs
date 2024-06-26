@@ -35,7 +35,6 @@ diesel::table! {
         seo_keywords -> Nullable<Varchar>,
         #[max_length = 255]
         seo_description -> Nullable<Varchar>,
-        content_id -> Int4,
         category_id -> Nullable<Int4>,
         #[max_length = 20]
         category -> Nullable<Varchar>,
@@ -74,9 +73,10 @@ diesel::table! {
 }
 
 diesel::table! {
-    article_content (id) {
-        id -> Int4,
-        content -> Nullable<Text>,
+    article_content (article_id) {
+        article_id -> Int4,
+        content -> Text,
+        last_time -> Nullable<Timestamp>,
     }
 }
 
@@ -236,6 +236,22 @@ diesel::table! {
 }
 
 diesel::table! {
+    record_2022 (record_time) {
+        id -> Int4,
+        table_id -> Int4,
+        #[max_length = 180]
+        table_name -> Varchar,
+        user_id -> Int4,
+        #[max_length = 18]
+        username -> Varchar,
+        #[max_length = 180]
+        action -> Varchar,
+        ip -> Inet,
+        record_time -> Timestamp,
+    }
+}
+
+diesel::table! {
     reptile_zhdc_books (id) {
         id -> Int4,
         #[max_length = 255]
@@ -310,6 +326,7 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(article_content -> article (article_id));
 diesel::joinable!(book_chapters_content -> book_chapters (chapter_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
@@ -325,6 +342,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     column,
     menus,
     record,
+    record_2022,
     reptile_zhdc_books,
     reptile_zhdc_chapters,
     rights,

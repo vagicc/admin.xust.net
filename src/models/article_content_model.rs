@@ -9,13 +9,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Insertable, Queryable, PartialEq, Eq, Deserialize, Serialize)]
 #[table_name = "article_content"]
 pub struct ArticleContent {
-    pub id: i32,
-    pub content: Option<String>,
+    pub article_id: i32,
+    pub content: String,
+    pub last_time: Option<NaiveDateTime>,
 }
 
 /// 通过ID查找文章详情
-pub fn get_article_content(article_id: i32) -> Option<ArticleContent> {
-    let query = article_content.find(article_id);
+pub fn get_article_content(articleid: i32) -> Option<ArticleContent> {
+    let query = article_content.find(articleid);
     let sql = diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string();
     log::debug!("get_article_content查询SQL：{:?}", sql);
 
