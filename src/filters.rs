@@ -32,6 +32,7 @@ pub fn all_routes(
     let check = crate::routes::check_route::check_link();
     let book = crate::routes::book_route::index();
     let chapters = crate::routes::chapters_route::list();
+    let article = crate::routes::article_route::index();
 
     let routes = home
         .or(favicon)
@@ -49,6 +50,7 @@ pub fn all_routes(
         .or(book)
         .or(chapters)
         .or(reptile)
+        .or(article)
         .recover(crate::session::inaccessible);
     routes
 }
