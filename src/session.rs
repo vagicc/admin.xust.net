@@ -114,6 +114,13 @@ pub async fn inaccessible(reject: warp::Rejection) -> Result<impl warp::Reply, w
         Ok(warp::redirect::see_other(warp::http::Uri::from_static(
             "/login",
         )))
+        //
+    } else if let Some(e) = reject.find::<warp::body::BodyDeserializeError>() {
+        log::error!(
+            "到这时，是因为Post请求的参数与结构体不相同，可以用Option来避免:{:#?}",
+            e
+        );
+        Ok(warp::redirect::see_other(warp::http::Uri::from_static("/")))
     } else if let Some(e) = reject.find::<warp::reject::MethodNotAllowed>() {
         //表示请求被拒绝。当一个请求的方法不被允许时
         log::error!(
