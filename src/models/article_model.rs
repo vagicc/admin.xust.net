@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use crate::db::get_connection;
 use crate::schema::article;
 use crate::schema::article::dsl::*;
@@ -29,6 +27,53 @@ pub struct Article {
     pub username: Option<String>,
     pub create: Option<i64>,
     pub last_time: Option<NaiveDateTime>,
+}
+
+#[derive(Debug, Clone, Insertable, AsChangeset)]
+#[diesel(table_name = article)]
+pub struct NewArticle{
+    pub title: String,                     //标题
+    pub cover: Option<String>,             //列表封面图
+    pub summary: Option<String>,    //文章摘要
+    pub seo_title: Option<String>,
+    pub seo_keywords: Option<String>,
+    pub seo_description: Option<String>,
+    pub category_id: Option<i32>,  //文章分类ID
+    pub category: Option<String>, //分类名，对应article_category表
+    pub columns_id: i32,         //专栏ID，0不属于任何专栏
+    pub available: Option<i16>,  //阅读权限：0免费、1登录、2私密
+    pub nav_id: Option<i32>,   //所属导航栏
+    pub visit: i64,  //阅读次数
+    pub collect: i64,//收藏次数
+    pub share: i64, //分享次数
+    pub user_id: Option<i32>,  
+    pub username: Option<String>,
+    pub create: Option<i64>, //创建时间( Unix 时间戳)
+    pub last_time: Option<NaiveDateTime>,
+}
+impl NewArticle{
+    pub fn insert(&self) -> i32 {
+        let mut connection = get_connection();
+        let query = diesel::insert_into(article)
+            .values(self)
+            .returning(id);
+        log::debug!(
+            "article表插入数据SQL：{:?}",
+            diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+        );
+        let result = query.get_result::<i32>(&mut connection);
+        match result {
+            Ok(insert_id) => {
+                log::debug!("article插入成功，ID为：{}", insert_id);
+                insert_id
+            }
+            Err(err) => {
+                //value too long for type character varying(255) 字段太短，插入内容太长
+                log::error!("article插入数据失败了：{}", err);
+                0
+            }
+        }
+    }
 }
 
 /// 通过ID查找文章详情
@@ -194,4 +239,21 @@ pub fn list_page(
     pages = crate::pager::default_full("article/index", count, page.unwrap_or(1), limit as u32);
 
     (count, list, pages)
+}
+
+pub fn modify(pk: i32, data: &NewArticle) -> Option<Article> {
+    let query = diesel::update(article.find(pk)).set(data);
+    log::error!(
+        "article表更新数据SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+
+    let mut conn = get_connection();
+    match query.get_result::<Article>(&mut conn) {
+        Ok(result) => Some(result),
+        Err(err) => {
+            log::error!("admins表修改数据失败：{}", err);
+            None
+        }
+    }
 }

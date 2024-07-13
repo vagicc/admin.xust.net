@@ -1,0 +1,317 @@
+{{#*inline "child"}}
+<div class="panel box-shadow-none content-header">
+    <div class="panel-body">
+        <div class="col-md-12">
+            <h3 class="animated fadeInLeft">文章列表</h3>
+            <div class="row">
+                <ol class="animated fadeInDown breadcrumb col-md-2 col-sm-12 col-xs-12">
+                    <li><a href="{{base_url}}">首页</a></li>
+                    <li class="active">列表</li>
+
+                    <!--按钮-->
+                    <span class="hidden-md hidden-lg pull-right" id="search-btn"
+                        style="display: inline-block;cursor: pointer;">
+                        搜索
+                        <span class="caret"></span>
+                    </span>
+                </ol>
+                <!--搜索内容-->
+                <div class="col-md-10 col-sm-12 col-xs-12" id="search">
+                    <ul class="">
+                        <form method="get" class="input-group">
+                            <li>
+                                <label class="hidden-md hidden-lg">标题：</label>
+                                <input type="text" name="title" value="{{get.title}}" placeholder="标题"
+                                    style="height:35px;width:130px">
+                            </li>
+                            <li class="input-group">
+                                <!-- <span class="input-group-addon" style="height:34px;">创建时间</span> -->
+                                <input type="text" name="create" value="{{get.create}}" placeholder="创建时间" id="date"
+                                    class="form-control" style="height:35px;width:100px">
+                            </li>
+
+                            <li class="input-group" style="margin-right:5px;">
+
+                                <select name="category_id" class="form-control">
+                                    <option value="">所属分类</option>
+                                    <option value="0" selected="selected">
+                                        分类名
+                                    </option>
+                                </select>
+                            </li>
+
+                            <li class="input-group">
+                                <select name="available" class="form-control">
+                                    <option value="3">阅读权限</option>
+                                    <option value="0" {{#if (eq get.available 0)}}selected="selected" {{/if}}>免费
+                                    </option>
+                                    <option value="1" {{#if (eq get.available 1)}}selected{{/if}}>登录</option>
+                                    <option value="2" {{#if (eq get.available 2)}}selected="selected" {{/if}}>私密
+                                    </option>
+                                </select>
+                            </li>
+
+                            <li>
+                                <input type="submit" class="btn btn-outline btn-success" value="搜索"
+                                    style="padding-right: 20px; padding-left: 20px;padding-top:5px;padding-bottom: 5px;">
+                            </li>
+                            <li>
+                                <a href="/article/index" class="btn btn-outline btn-warning"
+                                    style="padding-right: 20px; padding-left: 20px;padding-top:5px;padding-bottom: 5px;">重置</a>
+                            </li>
+
+                            <!-- <li>
+ 								<input type="submit" class="btn btn btn-gradient btn-info" value="搜索">
+ 							</li>
+ 							<li>
+ 								<a href="" class="btn btn-gradient btn-warning">重置</a>
+ 							</li> -->
+                        </form>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-md-12 top-20 padding-0">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-body">
+
+                <!-- 警告(提示) start -->
+                <?= view('alert/fade') ?>
+                <!-- 警告(提示) end -->
+
+                <div class="col-md-12 " style="padding-bottom:20px;">
+                    <!-- <a href="javascript:history.back(-1);" class="right btn btn-gradient btn-default" style="margin-left:8px;" >后退</a> -->
+                    <a href="/article/create/" title="新增" class="right btn btn-gradient btn-info">新增</a>
+
+                    <h4 style="padding-left:10px;">列表<span style="font-size: 12px;"> (共{{list_len}}条)</span></h4>
+
+                </div>
+
+                <div class="responsive-table">
+                    <form method="post" action="/article/expurgate/">
+                        <table class="table table-striped table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" class="icheck gou" name="checkbox1" />
+                                    </th>
+                                    <th>标题</th>
+                                    <th>所属分类</th>
+                                    <th>阅读权限</th>
+                                    <th>用户ID</th>
+                                    <th>浏览</th>
+                                    <th>创建时间</th>
+                                    <th>最后修改</th>
+                                    <th>预览</th>
+
+
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#if list}}
+                                {{#each list}}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="icheck none" name="id[{{id}}]" value="{{id}}" />
+                                    </td>
+                                    <td>
+                                        <b class="hidden-md hidden-lg">标题：</b>
+                                        {{title}}
+                                    </td>
+                                    <td><b class="hidden-md hidden-lg">所属分类：</b>
+                                        {{category}}
+                                    </td>
+                                    <td><b class="hidden-md hidden-lg">阅读权限：</b>
+                                        {{#if (eq available 0)}}
+                                        免费
+                                        {{else}}
+                                        1登录可阅-2私密
+                                        {{/if}}
+
+                                    </td>
+                                    <td><b class="hidden-md hidden-lg">用户ID：</b>
+                                        {{user_id}}
+                                    </td>
+                                    <td><b class="hidden-md hidden-lg">浏览：</b>
+                                        {{visit}}
+                                    </td>
+
+                                    <td class="time">
+                                        <b class="hidden-md hidden-lg">创建时间：</b>
+                                        <div>{{create}}</div>
+                                    </td>
+
+
+                                    <td class="iso-time">
+                                        <b class="hidden-md hidden-lg">最后修改：</b>
+                                        <div>{{last_time}}</div>
+                                    </td>
+
+
+                                    <td>
+                                        <a href="//elapse.date/article/detail/<?=$value->id ?>" target="_blank">点我预览</a>
+                                    </td>
+
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="/article/edit/{{id}}" title="修改" class="btn btn-xs btn-info">
+                                                <i class="ace-icon fa fa-pencil bigger-120"></i>
+                                            </a>
+                                            <a href="/article/delete/{{id}}" title="删除" class="btn btn-xs btn-danger"
+                                                onclick="return confirm('是否要删除文章:{{title}}（ID：{{id}}）？？');">
+                                                <i class="ace-icon fa fa-trash-o bigger-120"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                {{/each}}
+                                <tr>
+                                    <td colspan="999">
+                                        <div class="pull-right">
+                                            {{{pages}}}
+                                        </div>
+
+                                        <input type="checkbox" class="icheck pull-left gou" name="checkbox1" />
+
+                                        <!-- <input type="button" class="btn btn-gradient btn-danger" value="删除" /> -->
+                                        <input type="Submit" onclick="return confirm('是否删除选中的数据？？');"
+                                            class="btn btn-gradient btn-danger" value="删除" />
+
+                                        <!-- <input type="button" class=" btn btn-gradient btn-primary" value="修改" /> -->
+                                        <a href="/article/create/" title="新增"
+                                            class="btn  btn-gradient btn-success">新增</a>
+                                        <!-- <input type="button" class="btn btn-gradient btn-default" value="返回" /> -->
+                                        <input type="button" class="btn btn-gradient btn-default" value="后退"
+                                            onclick="javascript:history.back(-1);" />
+
+                                        <!-- <input type="button" class="btn btn-gradient btn-warning" value="警告" /> -->
+                                        <!-- <input type="button" class="btn btn-gradient btn-info" value="通知" /> -->
+
+
+
+                                    </td>
+
+                                </tr>
+                                {{else}}
+                                <tr>
+                                    <td colspan="200" style="text-align: center;">
+                                        暂无数据!! 现在<a href="/article/create/">新增</a>数据
+                                    </td>
+                                </tr>
+
+                                {{/if}}
+
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="asset/js/plugins/icheck.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="asset/css/datepicker.css" />
+<script type="text/javascript" src="asset/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="asset/js/locales/bootstrap-datepicker.zh-CN.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        // 选项样式
+        $('input').iCheck({
+            checkboxClass: 'icheckbox_flat-red',
+            radioClass: 'iradio_flat-red'
+        });
+        /*全选与反选*/
+        var num = 0;
+        $('.gou').next().each(function (i) {
+            $(this).on('click', function () {
+
+                if (num == 0) {
+                    $('.icheck').prop('checked', true).parent().addClass('checked');
+                    num += 1;
+                } else {
+                    $('.icheck').prop('checked', false).parent().removeClass('checked');
+                    num = 0;
+                }
+            });
+        });
+
+        /*搜索居右设置*/
+        var width = $(window).width();
+        if (width > 990) {
+            $('#search ul').addClass('pull-right');
+        }
+        $("#search-btn").click(function () {
+            $('#search').toggle();
+        });
+
+        //处理时间戳为可Y-M-D H:i:s
+        $('tr td.time div').each(function () {
+            var timestamp = $(this).text().trim(); // 获取文本并去除空白字符
+            if (timestamp === '') {
+                $(this).html("空时间戳");
+                return;
+            }
+
+            // 创建一个新的 Date 对象
+            //确保时间戳是以毫秒为单位。如果 1720849606 是秒为单位的时间戳,秒*1000=毫秒
+            var date = new Date(timestamp * 1000);
+
+            // 使用 toLocaleDateString 和 toLocaleTimeString 来格式化日期和时间
+            var formattedDate = date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            // var formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            var formattedTime = date.toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // 使用 24 小时制
+            });
+            // 替换日期格式中的斜杠为短横线
+            formattedDate = formattedDate.replace(/\//g, '-');
+            // 将日期和时间组合成一个字符串
+            var formattedDateTime = formattedDate + ' ' + formattedTime;  // 输出 "2021/01/01 00:00:00"
+            console.log(formattedDateTime);
+            $(this).html(formattedDateTime);
+        });
+
+        //（2024-06-10T05:32:33.708906）ISO 8601日期时间格式，分割显示 
+        $('tr td.iso-time div').each(function () {
+            var dateTimeStr = $(this).text().trim(); // 获取文本并去除空白字符
+            var dateTimeParts = dateTimeStr.split('T'); // 分割日期和时间
+
+            // 格式化日期和时间
+            var dateStr = dateTimeParts[0]; // 日期部分
+            var timeStr = dateTimeParts[1].split('.')[0]; // 时间部分，去掉毫秒
+
+            // 显示格式化后的日期和时间
+            // $(this).text('日期: ' + dateStr + ' 时间: ' + timeStr);
+            $(this).html(dateStr + " " + timeStr);
+        });
+
+        /*选择日期*/
+        $("#date").datepicker({
+            language: "zh-CN",
+            autoclose: true, //选中之后自动隐藏日期选择框
+            clearBtn: true, //清除按钮
+            todayBtn: true, //今日按钮
+            format: "yyyy-mm-dd" //日期格式，
+        });
+
+    });
+</script>
+
+{{/inline}}
+{{> (lookup this "parent")}}

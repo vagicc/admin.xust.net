@@ -97,7 +97,7 @@ pub async fn edit(id: i32, session: crate::session::Session) -> Result<impl Repl
 pub async fn do_edit(
     id: i32,
     form: admins_model::AdminPost,
-    session: crate::session::Session,
+    _session: crate::session::Session,
 ) -> Result<impl Reply, Rejection> {
     match form.validate() {
         Ok(post) => {

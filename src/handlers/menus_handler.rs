@@ -9,8 +9,8 @@ pub async fn list(
     parent_id: i32,
     session: crate::session::Session,
 ) -> Result<impl Reply, Rejection> {
-    log::debug!("菜单列表");
-    log::warn!("session:{:#?}", session);
+    // log::debug!("菜单列表");
+    // log::warn!("session:{:#?}", session);
 
     let mut parent_data: Option<menus_model::Menu> = None;
     if parent_id > 0 {
@@ -79,7 +79,7 @@ pub async fn do_new(
 ) -> Result<impl Reply, Rejection> {
     match form.validate() {
         Ok(post) => {
-            println!("=======接受到的POST=====:{:#?}", post);
+            // println!("=======接受到的POST=====:{:#?}", post);
             let data = menus_model::NewMenu {
                 order_by: post.order_by,
                 path_full: Some(post.path_full),
@@ -90,7 +90,7 @@ pub async fn do_new(
                 department: Some(post.department),
                 is_show: post.is_show,
             };
-            println!("插入的数据:{:#?}", data);
+            // println!("插入的数据:{:#?}", data);
 
             let insert_id = data.insert();
             log::error!("插入ID={}", insert_id);

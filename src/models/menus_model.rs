@@ -1,7 +1,7 @@
 use crate::db::get_connection;
 use crate::schema::menus;
 use crate::schema::menus::dsl::*;
-use chrono::NaiveDateTime;
+// use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -110,7 +110,7 @@ pub fn get_menu_level(lid: i16) -> Option<Vec<Menu>> {
 
 pub fn modify(pk: i32, data: &NewMenu) -> Option<Menu> {
     let query = diesel::update(menus.find(pk)).set(data);
-    log::error!(
+    log::debug!(
         "menus表更新数据SQL：{:?}",
         diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
     );
@@ -119,7 +119,7 @@ pub fn modify(pk: i32, data: &NewMenu) -> Option<Menu> {
     match query.get_result::<Menu>(&mut conn) {
         Ok(result) => Some(result),
         Err(err) => {
-            log::error!("admins表修改数据失败：{}", err);
+            log::error!("menus表修改数据失败：{}", err);
             None
         }
     }

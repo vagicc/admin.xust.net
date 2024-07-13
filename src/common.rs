@@ -127,6 +127,27 @@ pub fn random_key(len: usize) -> String {
         .collect()
 }
 
+/*
+ Unix 时间戳
+返回自 Unix 纪元（1970年1月1日 00:00:00 GMT）以来经过的秒数所测量的当前时间。
+ */
+pub fn time() -> u64 {
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    // 获取当前系统时间
+    let now = SystemTime::now();
+
+    // 将当前时间转换为 Unix 时间戳
+    let since_the_epoch = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
+    // 正常情况下时间不会倒退，所以这里使用 expect
+
+    // 将 Duration 转换为秒
+    let timestamp = since_the_epoch.as_secs();
+
+    // println!("当前的 Unix 时间戳为: {}", timestamp);
+    timestamp
+}
+
 pub fn now_naive_date_time() -> chrono::NaiveDateTime {
     // use chrono::prelude::{Local, NaiveDate, NaiveDateTime};
     let fmt = "%Y-%m-%d %H:%M:%S";

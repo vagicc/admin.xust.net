@@ -14,7 +14,7 @@ pub async fn list_page(
     get: book_chapters_m::GetQuery,
     session: Session,
 ) -> std::result::Result<impl Reply, Rejection> {
-    log::debug!("GET: /book/chapters/list");
+    log::debug!("书籍章节列表GET: /book/chapters/list");
 
     let (count, list, pages) = book_chapters_m::list_page(
         Some(page),

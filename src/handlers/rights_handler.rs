@@ -112,7 +112,7 @@ pub async fn do_new(
 }
 
 pub async fn list(page: u32, session: crate::session::Session) -> Result<impl Reply, Rejection> {
-    log::debug!("角色列表-分页");
+    // log::debug!("角色列表-分页");
 
     let (count, list, pages) = rights_model::list(Some(page), crate::constants::PER_PAGE);
 
