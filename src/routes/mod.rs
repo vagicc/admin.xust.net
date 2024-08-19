@@ -1,4 +1,5 @@
 pub mod admins_route;
+pub mod article_category_r;
 pub mod article_route;
 pub mod book_route;
 pub mod chapters_route;

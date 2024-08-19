@@ -13,7 +13,7 @@ authors = ["技术支持：临来笑笑生 <luck@xust.net>"]
 # https://crates.io/
 # tokio = { version = "1", features = ["full"] }
 tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread","fs"] }
-warp = { version = "0.3.6", features = ["tls","multipart","websocket"] }
+warp = { version = "0.3.7", features = ["tls","multipart","websocket"] }
 
 # diesel是Rust的ORM(对象关系映射器)和查询构建器
 # diesel为PostgreSQL、Mysql及SQLite提供了开箱即用的支持

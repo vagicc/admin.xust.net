@@ -1,4 +1,5 @@
 pub mod admins_model;
+pub mod article_category_m;
 pub mod article_content_m;
 pub mod article_model;
 pub mod book_category_m;

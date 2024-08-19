@@ -9,7 +9,7 @@ use serde_json::value::Map;
 use warp::{Rejection, Reply};
 
 //文章列表
-//响应GET: /book/list/{1}
+//响应GET: /article/index/{1}
 pub async fn list_page(
     page: u32,
     get: article_model::GetQuery,
