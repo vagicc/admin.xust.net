@@ -5,7 +5,7 @@
             <h3 class="animated fadeInLeft">文章分类</h3>
             <div class="row">
                 <ol class="animated fadeInDown breadcrumb col-md-2 col-sm-12 col-xs-12">
-                    <li><a href="<?= site_url() ?>">首页</a></li>
+                    <li><a href="/">首页</a></li>
                     <li class="active">列表</li>
 
                     <!--按钮-->
@@ -76,7 +76,8 @@
                 <div class="col-md-12 " style="padding-bottom:20px;">
                     <!-- <a href="javascript:history.back(-1);" class="right btn btn-gradient btn-default" style="margin-left:8px;" >后退</a> -->
                     <a href="/article-category/create/" title="新增" class="right btn btn-gradient btn-info">新增</a>
-                    <h4 style="padding-left:10px;">列表（{{list_len}}条）</h4>
+					<h4 style="padding-left:10px;">列表<span style="font-size: 12px;"> ({{list_len}}条)</span></h4>
+
                 </div>
 
                 <div class="responsive-table">
@@ -125,10 +126,11 @@
                                         {{create_id}}
                                     </td>
 
-                                    <td><b class="hidden-md hidden-lg">创建时间：</b>
-                                        {{create_time}}
+                                    <td class="iso-time">
+                                        <b class="hidden-md hidden-lg">创建时间：</b>
+                                        <div>{{create_time}}</div>
                                     </td>
-
+ 
                                     <td>
                                         <a href="/article/index/?category_id={{id}}"
                                             style="color:#27C24C;"><i class="fa fa-cny"></i>此分类文章 <span
@@ -146,7 +148,7 @@
                                 <tr>
                                     <td colspan="999">
                                         <div class="pull-right">
-                                            <?= $pager->links() ?>
+                                            {{{pages}}}
                                         </div>
 
                                         <input type="checkbox" class="icheck pull-left gou" name="checkbox1" />
@@ -226,6 +228,20 @@
         }
         $("#search-btn").click(function () {
             $('#search').toggle();
+        });
+
+        //（2024-06-10T05:32:33.708906）ISO 8601日期时间格式，分割显示 
+        $('tr td.iso-time div').each(function () {
+            var dateTimeStr = $(this).text().trim(); // 获取文本并去除空白字符
+            var dateTimeParts = dateTimeStr.split('T'); // 分割日期和时间
+
+            // 格式化日期和时间
+            var dateStr = dateTimeParts[0]; // 日期部分
+            var timeStr = dateTimeParts[1].split('.')[0]; // 时间部分，去掉毫秒
+
+            // 显示格式化后的日期和时间
+            // $(this).text('日期: ' + dateStr + ' 时间: ' + timeStr);
+            $(this).html(dateStr + " " + timeStr);
         });
 
         /*选择日期*/
