@@ -108,3 +108,62 @@ pub async fn new(
     let html = to_html_single("hint.html", data);
     Ok(warp::reply::html(html)) //直接返回html
 }
+
+pub async fn edit(id: i32, session: crate::session::Session) -> Result<impl Reply, Rejection> {
+    let mut data = Map::new();
+    let edit = article_category_m::get_article_category(id);
+    if edit.is_none() {
+        log::warn!("查无此数据:article_category表无ID:{}", id);
+        data.insert("jump_url".to_string(), to_json("/article-category/index"));
+        data.insert("message".to_string(), to_json("查无此数据:article表"));
+        let html = to_html_single("hint.html", data);
+        return Ok(warp::reply::html(html));
+    }
+
+    data.insert("edit".to_string(), to_json(edit.unwrap()));
+    let html = view("article-category/edit.html", data, session);
+
+    Ok(warp::reply::html(html)) //直接返回html
+}
+
+pub async fn do_edit(
+    id: i32,
+    form: ArticleCategoryPost,
+    session: crate::session::Session,
+) -> Result<impl Reply, Rejection> {
+    let mut message = String::new();
+
+    match form.validate() {
+        Ok(post) => {
+            let now = crate::common::now_naive_date_time();
+            let update_data = article_category_m::NewArticleCategory {
+                category: post.category,
+                seo_title: Some(post.seo_title),
+                seo_keywords: Some(post.seo_keywords),
+                seo_description: Some(post.seo_description),
+                show: post.show, //是否显示：默认1显示，0不显示
+                order_by: Some(post.order_by),
+                modify_id: Some(session.admin.id),
+                modify_time: Some(now),
+                create_id: None,
+                create_time: None,
+            };
+            let updated = article_category_m::modify(id, &update_data);
+            if updated.is_none() {
+                message = "文章分类修改出错".to_string();
+            } else {
+                message = "文章分类修改成功".to_string();
+            }
+        }
+        Err(e) => {
+            message = format!("文章分类修改POST表单认证不通过：{}", e);
+        }
+    }
+
+    let mut data = Map::new();
+    data.insert("jump_url".to_string(), to_json("/article-category/index"));
+    data.insert("message".to_string(), to_json(message));
+
+    let html = to_html_single("hint.html", data);
+    Ok(warp::reply::html(html)) //直接返回html
+}

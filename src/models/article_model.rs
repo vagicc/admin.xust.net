@@ -243,7 +243,7 @@ pub fn list_page(
 
 pub fn modify(pk: i32, data: &NewArticle) -> Option<Article> {
     let query = diesel::update(article.find(pk)).set(data);
-    log::error!(
+    log::debug!(
         "article表更新数据SQL：{:?}",
         diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
     );
@@ -252,7 +252,7 @@ pub fn modify(pk: i32, data: &NewArticle) -> Option<Article> {
     match query.get_result::<Article>(&mut conn) {
         Ok(result) => Some(result),
         Err(err) => {
-            log::error!("admins表修改数据失败：{}", err);
+            log::error!("article表修改数据失败：{}", err);
             None
         }
     }

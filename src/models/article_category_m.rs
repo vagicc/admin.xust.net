@@ -136,3 +136,38 @@ pub fn list_page(
 
     (count, list, pages)
 }
+
+/// 通过ID查找文章详情
+pub fn get_article_category(pky: i32) -> Option<ArticleCategory> {
+    let query = article_category.find(pky);
+    let sql = diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string();
+    log::debug!("get_article_category查询SQL：{:?}", sql);
+
+    let mut connection = get_connection();
+    let result = query.first::<ArticleCategory>(&mut connection);
+
+    match result {
+        Ok(data) => Some(data),
+        Err(e) => {
+            log::debug!("get_article_category查无数据：{}", e);
+            return None;
+        }
+    }
+}
+
+pub fn modify(pk: i32, data: &NewArticleCategory) -> Option<ArticleCategory> {
+    let query = diesel::update(article_category.find(pk)).set(data);
+    log::debug!(
+        "article_category表更新数据SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+
+    let mut conn = get_connection();
+    match query.get_result::<ArticleCategory>(&mut conn) {
+        Ok(result) => Some(result),
+        Err(err) => {
+            log::error!("article_category表修改数据失败：{}", err);
+            None
+        }
+    }
+}

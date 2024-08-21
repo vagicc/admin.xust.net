@@ -19,6 +19,22 @@ pub fn index() -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp:
             .and(with_session())
             .and_then(article_category_h::new));
 
+    let edit = warp::get()
+        .and(warp::path("article-category"))
+        .and(warp::path("edit"))
+        .and(warp::path::param())
+        .and(warp::path::end())
+        .and(with_session())
+        .and_then(article_category_h::edit)
+        .or(warp::post()
+            .and(warp::path("article-category"))
+            .and(warp::path("edit"))
+            .and(warp::path::param())
+            .and(warp::path::end())
+            .and(warp::body::form())
+            .and(with_session())
+            .and_then(article_category_h::do_edit));
+
     warp::get()
         .and(warp::path("article-category"))
         .and(warp::path("index"))
@@ -35,4 +51,5 @@ pub fn index() -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp:
             .and(with_session())
             .and_then(article_category_h::list_page))
         .or(new)
+        .or(edit)
 }
