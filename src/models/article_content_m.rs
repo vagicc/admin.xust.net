@@ -58,6 +58,28 @@ pub fn get_article_content(articleid: i32) -> Option<ArticleContent> {
     }
 }
 
+//删除一条记录
+pub fn delete(pky: i32) -> usize {
+    let query = diesel::delete(article_content.find(pky));
+    log::debug!(
+        "article_content表删除SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+    let mut conn = get_connection();
+    let deleted_rows = query.execute(&mut conn);
+    // crate::common::type_v(deleted_rows);
+    //变量值：Ok(1)  =>类型： core::result::Result<usize, diesel::result::Error>  删除成功1条数据
+    //变量值：Ok(0)  =>类型： core::result::Result<usize, diesel::result::Error>  删除成功0条数据
+
+    match deleted_rows {
+        Ok(row) => row,
+        Err(e) => {
+            log::error!("article_content表删除数据失败：{}", e);
+            0
+        }
+    }
+}
+
 pub fn modify(pk: i32, data: &ArticleContent) -> Option<ArticleContent> {
     let query = diesel::update(article_content.find(pk)).set(data);
     log::error!(

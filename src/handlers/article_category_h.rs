@@ -108,6 +108,15 @@ pub async fn new(
     let html = to_html_single("hint.html", data);
     Ok(warp::reply::html(html)) //直接返回html
 }
+ 
+//單個刪除
+pub async fn delete(id: i32, session: crate::session::Session) -> Result<impl Reply, Rejection> {
+    let _ = article_category_m::delete(id);
+    // 跳转到列表页
+    Ok(warp::redirect::see_other(warp::http::Uri::from_static(
+        "/article-category/index",
+    )))
+}
 
 pub async fn edit(id: i32, session: crate::session::Session) -> Result<impl Reply, Rejection> {
     let mut data = Map::new();
