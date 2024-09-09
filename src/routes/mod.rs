@@ -4,6 +4,7 @@ pub mod article_route;
 pub mod book_route;
 pub mod chapters_route;
 pub mod check_route;
+pub mod column_route;
 pub mod demo_route;
 pub mod home_route;
 pub mod login_route;

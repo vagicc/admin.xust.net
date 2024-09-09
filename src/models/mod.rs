@@ -6,6 +6,7 @@ pub mod book_category_m;
 pub mod book_chapters_content_m;
 pub mod book_chapters_m;
 pub mod books_model;
+pub mod column_model;
 pub mod menus_model;
 pub mod reptile_zhdc_books_m;
 pub mod reptile_zhdc_chapters_m;

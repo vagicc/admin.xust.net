@@ -4,6 +4,7 @@ pub mod article_handler;
 pub mod book_chapters_h;
 pub mod book_handler;
 pub mod check_link_h;
+pub mod column_handler;
 pub mod demo_handler;
 pub mod home_handler;
 pub mod login_handler;
