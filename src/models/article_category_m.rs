@@ -130,9 +130,16 @@ pub fn list_page(
         diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
     );
 
-    let list = query.get_results::<ArticleCategory>(&mut conn).unwrap_or(data_null);
+    let list = query
+        .get_results::<ArticleCategory>(&mut conn)
+        .unwrap_or(data_null);
 
-    pages = crate::pager::default_full("article-category/index", count, page.unwrap_or(1), limit as u32);
+    pages = crate::pager::default_full(
+        "article-category/index",
+        count,
+        page.unwrap_or(1),
+        limit as u32,
+    );
 
     (count, list, pages)
 }
@@ -189,6 +196,48 @@ pub fn modify(pk: i32, data: &NewArticleCategory) -> Option<ArticleCategory> {
         Ok(result) => Some(result),
         Err(err) => {
             log::error!("article_category表修改数据失败：{}", err);
+            None
+        }
+    }
+}
+
+/* 表查询插入结构体(Insertable：插入，Queryable：查询) */
+#[derive(Debug, Clone, Queryable, Serialize)]
+pub struct ArticleCategoryName {
+    pub id: i32,
+    pub category: String,
+}
+
+pub fn all_article_category() -> Option<Vec<ArticleCategoryName>> {
+    let query = article_category.select((id, category)).order_by(id.desc());
+
+    log::warn!(
+        "all_article_category表更新数据SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+    let mut conn = get_connection();
+    let result = query.get_results::<ArticleCategoryName>(&mut conn);
+    match result {
+        Ok(d) => Some(d),
+        Err(e) => {
+            log::error!("article_category表查找所有分類失敗：{}", e);
+            None
+        }
+    }
+}
+
+pub fn all_article_category23() -> Option<Vec<(i32, String)>> {
+    let query = article_category.select((id, category)).order_by(id.desc());
+    log::debug!(
+        "all_article_category表更新数据SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+    let mut conn = get_connection();
+    let result = query.get_results::<(i32, String)>(&mut conn);
+    match result {
+        Ok(d) => Some(d),
+        Err(e) => {
+            log::error!("article_category表查找所有分類失敗：{}", e);
             None
         }
     }

@@ -1,5 +1,7 @@
+use crate::models::article_category_m;
 use crate::models::article_content_m;
 use crate::models::article_model;
+use crate::models::column_model;
 use crate::session::Session;
 use crate::template::to_html_single;
 use crate::template::view;
@@ -41,6 +43,7 @@ pub struct ArticlePost {
     pub username: String,         //展示文章发表人
     pub nav_id: Option<i32>,      //所属导航栏ID
     pub category_id: Option<i32>, //文章分类id
+    pub category: Option<String>, //文章分类id
     pub columns_id: i32,          //专栏ID，0不属于任何专栏
     pub available: i16,           //阅读权限：0免费、1登录、2私密
     pub summary: Option<String>,  //文章摘要
@@ -66,6 +69,13 @@ pub async fn create(session: Session) -> std::result::Result<impl Reply, Rejecti
     log::debug!("[调试信息]访问了“/article/create/”");
 
     let mut data = Map::new();
+
+    let category = article_category_m::all_article_category();
+    data.insert("category".to_string(), to_json(category));
+
+    let column = column_model::all_Column_id_title();
+    data.insert("column".to_string(), to_json(column));
+
     // let html = to_html_single("reptile_new.html", data);
     let html = view("article/create.html", data, session);
 
@@ -150,10 +160,12 @@ pub async fn edit(id: i32, session: crate::session::Session) -> Result<impl Repl
 
     let content = article_content_m::get_article_content(id);
 
-    use crate::models::roles_model::get_all_role;
-    let all_roles = get_all_role();
+    let category = article_category_m::all_article_category();
+    data.insert("category".to_string(), to_json(category));
 
-    data.insert("all_roles".to_string(), to_json(all_roles));
+    let column = column_model::all_Column_id_title();
+    data.insert("column".to_string(), to_json(column));
+
     data.insert("edit".to_string(), to_json(edit.unwrap()));
     data.insert("article_content".to_string(), to_json(content));
     let html = view("article/edit.html", data, session);
@@ -178,7 +190,7 @@ pub async fn do_edit(
                 seo_keywords: post.seo_keywords,
                 seo_description: post.seo_description,
                 category_id: post.category_id,
-                category: None,
+                category: post.category,
                 columns_id: post.columns_id,
                 available: Some(post.available),
                 nav_id: post.nav_id,

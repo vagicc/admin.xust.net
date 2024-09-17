@@ -46,7 +46,7 @@
                                     <option value="0">请选择</option>
                                         <option value="1">1</option>
                                 </select>
-
+                                <span class="bar" style="color: red;">暫無用</span>
                             </div>
                         </div>
                     
@@ -58,9 +58,9 @@
 
                                 <select name="category_id" class="form-control" id="c_id" aria-describedby="basic-addon3">
                                     <option value="0">请选择</option>
-                                   
-                                            <option value="1">1</option>
-                                         
+                                        {{#each category}}
+                                            <option value="{{id}}">{{category}}</option>
+                                        {{/each}}
                                 </select>
                                 <span class="input-group-addon" id="basic-addon3"><a href="/article-category/create">新增分类</a></span>
                             </div>
@@ -74,11 +74,13 @@
 
                                 <select name="columns_id" class="form-control" id="columns_id" aria-describedby="basic-addon3">
                                     <option value="0">请选择</option>
-                                   
+                                    {{#each column}}
+                                        <option value="{{id}}">{{title}}</option>
+                                    {{/each}}
                                             <option value="1">1</option>
                                         
                                 </select>
-                                <span class="input-group-addon" id="basic-addon3"><a href="<?= site_url('column/create') ?>">新增专栏</a></span>
+                                <span class="input-group-addon" id="basic-addon3"><a href="/column/create/">新增专栏</a></span>
                             </div>
                         </div>
                     </div>

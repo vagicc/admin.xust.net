@@ -87,12 +87,10 @@ pub struct NewColumn {
     pub create_id: Option<i32>,
     pub create_time: Option<NaiveDateTime>,
 }
-impl NewColumn{
+impl NewColumn {
     pub fn insert(&self) -> i32 {
         let mut connection = get_connection();
-        let query = diesel::insert_into(column)
-            .values(self)
-            .returning(id);
+        let query = diesel::insert_into(column).values(self).returning(id);
         log::debug!(
             "column表插入数据SQL：{:?}",
             diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
@@ -112,12 +110,12 @@ impl NewColumn{
     }
 }
 
-//後臺列表GET查詢條件 
+//後臺列表GET查詢條件
 #[derive(Debug, Clone, serde_derive::Deserialize, serde_derive::Serialize)]
 pub struct GetQuery {
-    pub title: Option<String>, //标题
-    pub subhead: Option<String>,        //副标题
-    pub author:Option<String>,  //作者
+    pub title: Option<String>,   //标题
+    pub subhead: Option<String>, //副标题
+    pub author: Option<String>,  //作者
 }
 
 /// 取得列表数据
@@ -219,7 +217,6 @@ pub fn modify(pk: i32, data: &NewColumn) -> Option<Column> {
     }
 }
 
-
 //删除一条记录
 pub fn delete(pky: i32) -> usize {
     let query = diesel::delete(column.find(pky));
@@ -256,6 +253,29 @@ pub fn get_column(pky: i32) -> Option<Column> {
         Err(e) => {
             log::debug!("get_column查无数据：{}", e);
             return None;
+        }
+    }
+}
+
+#[derive(Debug, Clone, Queryable, serde::Serialize)]
+pub struct ColumnIdName {
+    pub id: i32,
+    pub title: String,
+}
+
+pub fn all_Column_id_title() -> Option<Vec<ColumnIdName>> {
+    let query = column.select((id, title)).order_by(id.desc());
+    log::warn!(
+        "all_Column_id_title表查詢SQL：{:?}",
+        diesel::debug_query::<diesel::pg::Pg, _>(&query).to_string()
+    );
+    let mut conn = get_connection();
+    let result = query.get_results::<ColumnIdName>(&mut conn);
+    match result {
+        Ok(data) => Some(data),
+        Err(e) => {
+            log::error!("article_category表查找所有分類失敗：{}", e);
+            None
         }
     }
 }
