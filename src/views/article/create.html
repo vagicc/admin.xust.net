@@ -186,7 +186,7 @@
             var formData = new FormData();
             formData.append("file", file);
             $.ajax({
-                url: "<?= site_url('upload/summernote') ?>", //上传图片URL
+                url: "/upload/summernote/", //上传图片URL
                 data: formData,
                 cache: false,
                 contentType: false,

@@ -68,3 +68,7 @@ select = "0.6.0"
 url = "2.5.0"
 #爬虫下载相关
 tempfile = "3.10.1"
+
+#文件上傳 
+futures-util = "0.3.30"
+bytes = "1.7.2"

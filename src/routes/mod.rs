@@ -13,3 +13,4 @@ pub mod menus_route;
 pub mod reptile_route;
 pub mod rights_route;
 pub mod role_route;
+pub mod upload_route;

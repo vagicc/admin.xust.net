@@ -35,6 +35,7 @@ pub fn all_routes(
     let article = crate::routes::article_route::index();
     let article_category = crate::routes::article_category_r::index();
     let column = crate::routes::column_route::index();
+    let upload = crate::routes::upload_route::demo();
 
     let routes = home
         .or(favicon)
@@ -55,6 +56,7 @@ pub fn all_routes(
         .or(article)
         .or(article_category)
         .or(column)
+        .or(upload)
         .recover(crate::session::inaccessible);
     routes
 }
