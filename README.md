@@ -1,6 +1,6 @@
 # admin.xust.net
 # 这www.xust.net的后台管理
-# 做完书籍，能发布文章，能发布书，(就学Flutter,AI,Rust的無人機開發
+# 做完书籍，能发布文章，能发布书，(就学Flutter,AI,Rust的無人機開發，嵌入式开发）
 
 AI框架:
 Burn应该为最好的选择，开发官网：https://burn.dev/  公司官网：https://tracel.ai/
@@ -14,8 +14,12 @@ cargo new admin-xust-net
 
 # Rust電子書籍：
 Rust语言圣经(Rust Course) https://course.rs/about-book.html
+Discovery：https://jzow.github.io/discovery/
+Discovery（Rust探索微控制器）：https://jzow.github.io/discovery/microbit/
 嵌入式Rust https://xxchang.github.io/book/
 
+# 书看到：
+   https://jzow.github.io/discovery/microbit/05-led-roulette/flash-it.html
 # 功能開發計劃
 
 # 应该先抓书：“中华典藏” ：https://www.zhonghuadiancang.com/
