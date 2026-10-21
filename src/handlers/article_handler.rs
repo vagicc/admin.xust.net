@@ -55,7 +55,7 @@ impl ArticlePost {
 }
 
 pub async fn create(session: Session) -> Response {
-    log::debug!("[调试信息]访问了“/article/create/”");
+    log::error!("[调试信息]访问了“/article/create/”");
 
     let mut data = Map::new();
     let category = article_category_m::all_article_category();
