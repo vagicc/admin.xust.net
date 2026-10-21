@@ -95,7 +95,7 @@ pub fn update_publish(pky: i32, published: bool) -> Option<ReptileZhdcChapters> 
     }
 }
 
-pub fn delete_book(book_id: i32)-> usize {
+pub fn delete_book(book_id: i32) -> usize {
     let query = diesel::delete(reptile_zhdc_chapters.filter(zhdc_books_id.eq(book_id)));
     log::debug!(
         "reptile_zhdc_chapters表删除SQL：{:?}",

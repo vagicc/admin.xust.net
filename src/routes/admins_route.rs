@@ -1,71 +1,28 @@
 use crate::handlers::admins_handler;
-use warp::Filter;
+use crate::models::admins_model::AdminPost;
+use axum::extract::{Form, Path, Query};
+use axum::routing::{get, post};
+use axum::Router;
 
-pub fn index() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    let first = warp::get()
-        .and(warp::path!("admins" / "index"))
-        .and(warp::path::end())
-        .and(crate::session::with_session())
-        .and_then(|sesion: crate::session::Session| async {
-            admins_handler::list(1, sesion).await
-        });
-
-    warp::get()
-        .and(warp::path("admins"))
-        .and(warp::path("index"))
-        .and(warp::path::param())
-        .and(warp::path::end())
-        .and(crate::session::with_session())
-        .and_then(admins_handler::list)
-        .or(first)
-        .or(add())
-        .or(edit())
-        .or(delete())
-}
-
-pub fn add() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    let post = warp::post()
-        .and(warp::path("admins"))
-        .and(warp::path("create"))
-        .and(warp::path::end())
-        .and(warp::body::form())
-        .and(crate::session::with_session())
-        .and_then(admins_handler::do_new);
-
-    warp::get()
-        .and(warp::path!("admins" / "create"))
-        .and(warp::path::end())
-        .and(crate::session::with_session())
-        .and_then(admins_handler::create_html)
-        .or(post)
-}
-
-pub fn edit() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    let post = warp::post()
-        .and(warp::path("admins"))
-        .and(warp::path("edit"))
-        .and(warp::path::param())
-        .and(warp::path::end())
-        .and(warp::body::form())
-        .and(crate::session::with_session())
-        .and_then(admins_handler::do_edit);
-
-    warp::get()
-        .and(warp::path("admins"))
-        .and(warp::path("edit"))
-        .and(warp::path::param())
-        .and(warp::path::end())
-        .and(crate::session::with_session())
-        .and_then(admins_handler::edit)
-        .or(post)
-}
-
-pub fn delete() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    warp::get()
-        .and(warp::path("admins"))
-        .and(warp::path("delete"))
-        .and(warp::path::param())
-        .and(warp::path::end())
-        .and(crate::session::with_session())
-        .and_then(admins_handler::delete)
+pub fn router() -> Router {
+    Router::new()
+        .route(
+            "/admins/index",
+            get(|session: crate::session::Session| async move {
+                admins_handler::list(1, session).await
+            }),
+        )
+        .route(
+            "/admins/index/{page}",
+            get(
+                |Path(page): Path<u32>, session: crate::session::Session| async move {
+                    admins_handler::list(page, session).await
+                },
+            ),
+        )
+        .route("/admins/create", get(admins_handler::create_html))
+        .route("/admins/create", post(admins_handler::do_new))
+        .route("/admins/edit/{id}", get(admins_handler::edit))
+        .route("/admins/edit/{id}", post(admins_handler::do_edit))
+        .route("/admins/delete/{id}", get(admins_handler::delete))
 }

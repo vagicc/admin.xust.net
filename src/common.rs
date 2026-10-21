@@ -19,75 +19,78 @@ where
 /// # 示例(Examples)
 ///
 /// ```
-/// # use warp::http::StatusCode;
+/// # use StatusCode;
 ///
-/// let status_code = warp::http::StatusCode::OK;
+/// let status_code = StatusCode::OK;
 /// let data = "data数据结构".to_string();
 /// let message = "成功".to_string();
 /// rresponse_json(status_code, Some(&data), None);
 /// ```
-pub fn response_json<T>(
-    status: warp::http::StatusCode,
-    data: Option<&T>,
+use axum::http::{Response, StatusCode};
+use axum::response::IntoResponse;
+
+pub fn response_json<'a, T>(
+    status: StatusCode,
+    data: Option<&'a T>,
     message: Option<String>,
-) -> std::result::Result<impl warp::Reply, warp::Rejection>
+) -> std::result::Result<impl IntoResponse, StatusCode>
 where
     T: ?Sized + serde::Serialize,
 {
     use serde::{Deserialize, Serialize};
-    #[derive(Debug, Deserialize, Serialize, Clone)]
-    pub struct RespondData<T>
+    #[derive(Debug, Serialize, Clone)]
+    pub struct RespondData<'b, T>
     where
-        T: Serialize,
+        T: Serialize + ?Sized,
     {
         status: u16,
         message: Option<String>,
-        data: Option<T>,
+        data: Option<&'b T>,
     }
 
     let response = RespondData {
         status: status.as_u16(),
-        message: message,
-        data: data,
+        message,
+        data,
     };
 
-    let response_string = serde_json::to_string(&response).unwrap().clone();
+    let response_string = serde_json::to_string(&response).unwrap();
 
-    Ok(warp::http::Response::builder()
+    Ok(Response::builder()
         .status(status)
         .header("Content-type", "application/json")
-        .body(response_string))
+        .body(response_string)
+        .unwrap())
 }
 
 pub fn _response_json_old(
-    status: warp::http::StatusCode,
+    status: StatusCode,
     data: String,
-) -> std::result::Result<impl warp::Reply, warp::Rejection> {
+) -> std::result::Result<impl IntoResponse, StatusCode> {
     use serde::{Deserialize, Serialize};
 
     #[derive(Debug, Deserialize, Serialize, Clone)]
     pub struct RespondData {
         status: u16,
-        data: String, //message
+        data: String,
     }
 
     let response = RespondData {
         status: status.as_u16(),
-        data: data,
+        data,
     };
 
-    // let kd=serde_json::to_string(&response).unwrap();
-
-    Ok(warp::http::Response::builder()
+    Ok(Response::builder()
         .status(status)
         .header("Content-type", "application/json")
-        .body(serde_json::to_string(&response).unwrap()))
+        .body(serde_json::to_string(&response).unwrap())
+        .unwrap())
 }
 
 pub fn _response_json_old_yl<T>(
-    status: warp::http::StatusCode,
+    status: StatusCode,
     data: &T,
-) -> std::result::Result<impl warp::Reply, warp::Rejection>
+) -> std::result::Result<impl IntoResponse, StatusCode>
 where
     T: ?Sized + serde::Serialize,
 {
@@ -99,20 +102,21 @@ where
         T: ?Sized + Serialize,
     {
         status: u16,
-        data: T, //message message: Option<String>,
+        data: T,
     }
 
     let response = RespondData {
         status: status.as_u16(),
-        data: data,
+        data,
     };
 
-    let response_string = serde_json::to_string(&response).unwrap().clone();
+    let response_string = serde_json::to_string(&response).unwrap();
 
-    Ok(warp::http::Response::builder()
+    Ok(Response::builder()
         .status(status)
         .header("Content-type", "application/json")
-        .body(response_string))
+        .body(response_string)
+        .unwrap())
 }
 
 /* 产生随机字符串 */

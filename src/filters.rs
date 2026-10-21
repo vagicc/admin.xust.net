@@ -1,62 +1,47 @@
-use crate::routes::admins_route;
-use crate::routes::demo_route;
-use crate::routes::home_route;
-use crate::routes::login_route;
-use crate::routes::menus_route;
-use crate::routes::role_route;
-use warp::Filter;
+use crate::routes::{
+    admins_route, article_category_r, article_route, book_route, chapters_route, check_route,
+    column_route, demo_route, home_route, login_route, logout_route, menus_route, reptile_route,
+    rights_route, role_route, upload_route,
+};
+use axum::http::StatusCode;
+use axum::response::IntoResponse;
+use axum::{
+    extract::Path,
+    routing::{get, get_service},
+    Router,
+};
+use tower_http::services::{ServeDir, ServeFile};
 
-pub fn all_routes(
-) -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
-    let favicon = warp::get()
-        .and(warp::path("favicon.ico"))
-        .and(warp::path::end())
-        .and(warp::fs::file("./static/favicon.ico"));
+async fn hello(Path(name): Path<String>) -> impl IntoResponse {
+    format!("你好，{}!", name)
+}
 
-    //.well-known  此目录是申请免费https证书用到
-    let well = warp::path(".well-known").and(warp::fs::dir("./static/.well-known"));
-    //静态文件目录
-    let dir = warp::path("static").and(warp::fs::dir("./static"));
-    let login = login_route::index();
-    let menus = menus_route::index();
-    let admins = admins_route::index();
-    let role = role_route::index();
-    let rights = crate::routes::rights_route::index();
-    let logout = crate::routes::logout_route::quit();
-    let home = home_route::index();
-
-    let hello = warp::path!("hello" / String).map(|name| format!("你好，{}!", name));
-    let demo = demo_route::index();
-
-    let reptile = crate::routes::reptile_route::new();
-    let check = crate::routes::check_route::check_link();
-    let book = crate::routes::book_route::index();
-    let chapters = crate::routes::chapters_route::list();
-    let article = crate::routes::article_route::index();
-    let article_category = crate::routes::article_category_r::index();
-    let column = crate::routes::column_route::index();
-    let upload = crate::routes::upload_route::demo();
-
-    let routes = home
-        .or(favicon)
-        .or(well)
-        .or(dir)
-        .or(login)
-        .or(menus)
-        .or(admins)
-        .or(role)
-        .or(rights)
-        .or(logout)
-        .or(hello)
-        .or(demo)
-        .or(check)
-        .or(book)
-        .or(chapters)
-        .or(reptile)
-        .or(article)
-        .or(article_category)
-        .or(column)
-        .or(upload)
-        .recover(crate::session::inaccessible);
-    routes
+pub fn all_routes() -> Router {
+    Router::new()
+        .route(
+            "/favicon.ico",
+            get_service(ServeFile::new("./static/favicon.ico")),
+        )
+        .nest_service(
+            "/.well-known",
+            get_service(ServeDir::new("./static/.well-known")),
+        )
+        .nest_service("/static", get_service(ServeDir::new("./static")))
+        .route("/hello/{name}", get(hello))
+        .merge(login_route::router())
+        .merge(menus_route::router())
+        .merge(admins_route::router())
+        .merge(role_route::router())
+        .merge(rights_route::router())
+        .merge(logout_route::router())
+        .merge(home_route::router())
+        .merge(demo_route::router())
+        .merge(reptile_route::router())
+        .merge(check_route::router())
+        .merge(book_route::router())
+        .merge(chapters_route::router())
+        .merge(article_route::router())
+        .merge(article_category_r::router())
+        .merge(column_route::router())
+        .merge(upload_route::router())
 }

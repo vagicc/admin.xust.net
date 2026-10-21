@@ -1,4 +1,5 @@
 use crate::common::get_env;
+use axum::{routing::get, Router};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 
 // 每个文件要用mod引入才能使用
@@ -33,39 +34,29 @@ async fn main() {
     log::error!("错误日志");
     log::debug!("调试日志");
     log::trace!("trace跟踪日志");
-    log::info!("warp框架web站点：{}", get_env("BASE_URL"));
+    log::info!("axum 框架 web 站点：{}", get_env("BASE_URL"));
 
-    let routes = filters::all_routes();
-
-    //取得https证书等
-    // let cert_path = get_env("cert_path");
-    // let key_path = get_env("key_path");
-    // let ip_addr = get_env("ip_address");
-    // let socket_addr: SocketAddr = ip_addr.as_str().parse().unwrap();
+    let app = filters::all_routes();
 
     let port = get_env("PORT").parse::<u16>().expect("端口字符转整形出错");
     let is_ipv6 = get_env("IS_IPV6")
         .parse::<bool>()
         .expect("监听IPv6或监听IPv4=>BOOL出错");
 
-    if is_ipv6 {
-        warp::serve(routes)
-            // .tls()   //https
-            // .cert_path(cert_path) //https
-            // .key_path(key_path) //https
-            // .run(socket_addr)
-            .run(SocketAddr::new(
-                IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0)),
-                port,
-            ))
-            .await;
+    let socket_addr = if is_ipv6 {
+        SocketAddr::new(IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0)), port)
     } else {
-        warp::serve(routes)
-            // .tls()   //https
-            // .cert_path(cert_path) //https
-            // .key_path(key_path) //https
-            // .run(socket_addr)
-            .run(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port))
-            .await;
-    }
+        SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port)
+    };
+
+    let listener = tokio::net::TcpListener::bind(socket_addr)
+        .await
+        .expect("Failed to bind socket");
+
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await
+    .expect("Server failed");
 }

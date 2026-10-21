@@ -2,17 +2,15 @@ use crate::models::article_category_m;
 use crate::session::Session;
 use crate::template::to_html_single;
 use crate::template::view;
+use axum::extract::{Form, Path};
+use axum::http::header;
+use axum::http::StatusCode;
+use axum::response::{Html, IntoResponse, Redirect, Response};
 use handlebars::to_json;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::value::Map;
-use warp::{Rejection, Reply};
 
-//文章分类列表：/article-category/index
-pub async fn list_page(
-    page: u32,
-    get: article_category_m::GetQuery,
-    session: Session,
-) -> std::result::Result<impl Reply, Rejection> {
+pub async fn list_page(page: u32, get: article_category_m::GetQuery, session: Session) -> Response {
     log::debug!("文章分类列表GET：/article-category/index");
 
     let (count, list, pages) = article_category_m::list_page(
@@ -22,33 +20,28 @@ pub async fn list_page(
     );
 
     let mut data = Map::new();
-    data.insert("list_len".to_string(), to_json(count)); //
-    data.insert("list".to_string(), to_json(list)); //
+    data.insert("list_len".to_string(), to_json(count));
+    data.insert("list".to_string(), to_json(list));
     data.insert("pages".to_string(), to_json(pages));
     data.insert("get".to_string(), to_json(get));
 
     let html = view("article-category/list.html", data, session);
-
-    Ok(warp::reply::html(html)) //直接返回html
+    Html(html).into_response()
 }
 
-/* 响应GET： /article-category/create */
-pub async fn create(session: Session) -> std::result::Result<impl Reply, Rejection> {
+pub async fn create(session: Session) -> Response {
     log::debug!("[调试信息]访问了“/article-category/create/”");
 
-    let mut data = Map::new();
-    // let html = to_html_single("reptile_new.html", data);
+    let data = Map::new();
     let html = view("article-category/create.html", data, session);
-
-    Ok(warp::reply::html(html)) //直接返回html
-                                // Err(warp::reject::not_found())   //错误的返回状态码
+    Html(html).into_response()
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct ArticleCategoryPost {
     pub category: String,
     pub order_by: i16,
-    pub show: i16, ////是否显示：默认1显示，0不显示
+    pub show: i16,
     pub seo_title: String,
     pub seo_keywords: String,
     pub seo_description: String,
@@ -67,27 +60,23 @@ impl ArticleCategoryPost {
     }
 }
 
-pub async fn new(
-    form: ArticleCategoryPost,
-    session: Session,
-) -> std::result::Result<impl Reply, Rejection> {
+pub async fn new(_session: Session, Form(form): Form<ArticleCategoryPost>) -> Response {
     log::debug!("接收到的post:{:#?}", form);
     let mut message = String::new();
 
     match form.validate() {
         Ok(post) => {
             let now = crate::common::now_naive_date_time();
-
             let data = article_category_m::NewArticleCategory {
                 category: post.category,
                 seo_title: Some(post.seo_title),
                 seo_keywords: Some(post.seo_keywords),
                 seo_description: Some(post.seo_description),
-                show: post.show, //是否显示：默认1显示，0不显示
+                show: post.show,
                 order_by: Some(post.order_by),
                 modify_id: None,
                 modify_time: None,
-                create_id: Some(session.admin.id),
+                create_id: Some(_session.admin.id),
                 create_time: Some(now),
             };
             if data.insert() != 0 {
@@ -104,21 +93,16 @@ pub async fn new(
     let mut data = Map::new();
     data.insert("jump_url".to_string(), to_json("/article-category/index"));
     data.insert("message".to_string(), to_json(message));
-
     let html = to_html_single("hint.html", data);
-    Ok(warp::reply::html(html)) //直接返回html
-}
- 
-//單個刪除
-pub async fn delete(id: i32, session: crate::session::Session) -> Result<impl Reply, Rejection> {
-    let _ = article_category_m::delete(id);
-    // 跳转到列表页
-    Ok(warp::redirect::see_other(warp::http::Uri::from_static(
-        "/article-category/index",
-    )))
+    Html(html).into_response()
 }
 
-pub async fn edit(id: i32, session: crate::session::Session) -> Result<impl Reply, Rejection> {
+pub async fn delete(Path(id): Path<i32>, _session: Session) -> Response {
+    let _ = article_category_m::delete(id);
+    Redirect::to("/article-category/index").into_response()
+}
+
+pub async fn edit(Path(id): Path<i32>, session: Session) -> Response {
     let mut data = Map::new();
     let edit = article_category_m::get_article_category(id);
     if edit.is_none() {
@@ -126,20 +110,19 @@ pub async fn edit(id: i32, session: crate::session::Session) -> Result<impl Repl
         data.insert("jump_url".to_string(), to_json("/article-category/index"));
         data.insert("message".to_string(), to_json("查无此数据:article表"));
         let html = to_html_single("hint.html", data);
-        return Ok(warp::reply::html(html));
+        return Html(html).into_response();
     }
 
     data.insert("edit".to_string(), to_json(edit.unwrap()));
     let html = view("article-category/edit.html", data, session);
-
-    Ok(warp::reply::html(html)) //直接返回html
+    Html(html).into_response()
 }
 
 pub async fn do_edit(
-    id: i32,
-    form: ArticleCategoryPost,
-    session: crate::session::Session,
-) -> Result<impl Reply, Rejection> {
+    Path(id): Path<i32>,
+    _session: Session,
+    Form(form): Form<ArticleCategoryPost>,
+) -> Response {
     let mut message = String::new();
 
     match form.validate() {
@@ -150,9 +133,9 @@ pub async fn do_edit(
                 seo_title: Some(post.seo_title),
                 seo_keywords: Some(post.seo_keywords),
                 seo_description: Some(post.seo_description),
-                show: post.show, //是否显示：默认1显示，0不显示
+                show: post.show,
                 order_by: Some(post.order_by),
-                modify_id: Some(session.admin.id),
+                modify_id: Some(_session.admin.id),
                 modify_time: Some(now),
                 create_id: None,
                 create_time: None,
@@ -172,7 +155,6 @@ pub async fn do_edit(
     let mut data = Map::new();
     data.insert("jump_url".to_string(), to_json("/article-category/index"));
     data.insert("message".to_string(), to_json(message));
-
     let html = to_html_single("hint.html", data);
-    Ok(warp::reply::html(html)) //直接返回html
+    Html(html).into_response()
 }

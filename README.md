@@ -59,4 +59,135 @@ pg_dump -h 127.0.0.1 -U postgres -a -O --inserts -d xust -T __diesel_schema_migr
 psql -h 107.174.102.197 -U postgres -d xust -f xust.bf.2024.5.14.sql
 psql -h 127.0.0.1 -U postgres -d xust -f xust.bf.2024.5.14.sql
 
+
+while true; do ssh -D 5858 root@107.174.102.197 || true; done
  
+查看本地（Ubuntu）的货币格式设置：
+在本地 psql 中运行：SHOW lc_monetary;
+postgres=# SHOW lc_monetary;
+
+ lc_monetary 
+
+-------------
+
+ en_US.UTF-8
+
+(1 row)
+
+
+
+postgres=# 
+假设本地返回的是 en_US.UTF-8 或 zh_CN.UTF-8。
+
+备份本机数据：
+pg_dump -U postgres -h localhost -p 5432 -d 你的数据库名 -F p -f /tmp/你的数据库名_plain.sql
+
+sed -i "3i SET lc_monetary = 'en_US.UTF-8';" /tmp/你的数据库名_plain.sql
+
+
+上传后：
+
+su - postgres
+psql
+CREATE DATABASE 你的数据库名;
+\q;
+
+一键执行数据导入:
+
+psql -d 你的数据库名 -f /tmp/你的数据库名_plain.sql
+
+数据库性能黄金收尾（更新统计信息）：
+导入完成后，再次进入该数据库：
+psql -d 你的数据库名
+执行垃圾回收与统计分析，让 PG 18 优化器满血复活：
+VACUUM ANALYZE;
+\q;
+
+
+检查命令（全局查找 money 类型）
+SELECT 
+    table_schema AS 架构名,
+    table_name AS 表名,
+    column_name AS 列名,
+    data_type AS 数据类型
+FROM 
+    information_schema.columns
+WHERE 
+    data_type = 'money'
+    AND table_schema NOT IN ('pg_catalog', 'information_schema');
+
+   
+pg_dump -U postgres -h localhost -p 5432 -d xust -F p -f /tmp/xust_plain.sql
+sed -i "3i SET lc_monetary = 'en_US.UTF-8';" /tmp/xust_plain.sql
+
+scp /tmp/xust_plain.sql 远程用户名@服务器IP:/tmp/
+服务器：
+psql -c "CREATE DATABASE xust;"
+psql -d xust -f /tmp/xust_plain.sql
+psql -d xust -c "VACUUM ANALYZE;"
+
+pg_dump -U postgres -h localhost -p 5432 -d elapse -F p -f /tmp/elapse_plain.sql
+sed -i "3i SET lc_monetary = 'en_US.UTF-8';" /tmp/elapse_plain.sql
+
+服务器：
+psql -c "CREATE DATABASE elapse;"
+psql -d elapse -f /tmp/elapse_plain.sql
+psql -d elapse -c "VACUUM ANALYZE;"
+
+pg_dump -U postgres -h localhost -p 5432 -d admin -F p -f /tmp/admin_plain.sql
+
+服务器：
+psql -c "CREATE DATABASE admin;"
+psql -d admin -f /tmp/admin_plain.sql
+psql -d admin -c "VACUUM ANALYZE;"
+
+
+pg_dump -U postgres -h localhost -p 5432 -d manage -F p -f /tmp/manage_plain.sql
+
+服务器：
+psql -c "CREATE DATABASE manage;"
+psql -d manage -f /tmp/manage_plain.sql
+psql -d manage -c "VACUUM ANALYZE;"
+
+
+pg_dump -U postgres -h localhost -p 5432 -d xueyigou -F p -f /tmp/xueyigou_plain.sql
+sed -i "3i SET lc_monetary = 'en_US.UTF-8';" /tmp/xueyigou_plain.sql
+
+scp /tmp/xueyigou_plain.sql 远程用户名@服务器IP:/tmp/
+服务器：
+psql -c "CREATE DATABASE xueyigou;"
+psql -d xueyigou -f /tmp/xueyigou_plain.sql
+psql -d xueyigou -c "VACUUM ANALYZE;"
+
+
+把rust的项目做到服务：
+vim /etc/systemd/system/www.gwmc.site.service
+[Unit]
+Description=Warp Site: www.gwmc.site
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/www-gwmc-site
+ExecStart=/var/www/www-gwmc-site/target/release/www-gwmc-site 
+Restart=on-failure
+RestartSec=5
+Environment=RUST_LOG=info
+
+[Install]
+WantedBy=multi-user.target
+
+然后：
+# 1. 重载 systemd 配置（告诉系统有新服务）
+sudo systemctl daemon-reload
+
+# 2. 启动服务
+sudo systemctl start www.gwmc.site
+
+# 3. 设置开机自启（下次重启后自动启动）
+sudo systemctl enable www.gwmc.site
+
+# 4. 查看状态（确认是否正常运行）
+sudo systemctl status www.gwmc.site
+

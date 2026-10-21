@@ -284,9 +284,9 @@ pub async fn zhonghuadiancang_select(html: &str) -> ZhongHuaDianCangBook {
                             let section_url = c_link.attr("href").unwrap_or("");
                             println!("({}) {}", index, section_title);
                             println!("  {}", section_url);
-                            
-                            let li_title=format!("{} {}",chapter_title, section_title);
-                            let url=section_url.to_string();
+
+                            let li_title = format!("{} {}", chapter_title, section_title);
+                            let url = section_url.to_string();
                             let temp = Chapter {
                                 title: li_title,
                                 url: url,

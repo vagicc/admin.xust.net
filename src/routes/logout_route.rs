@@ -1,10 +1,7 @@
 use crate::handlers::logout_handler;
-use warp::Filter;
+use axum::routing::get;
+use axum::Router;
 
-/// 退出登录：GET: /logout
-pub fn quit() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    warp::get()
-        .and(warp::path("logout"))
-        .and(warp::path::end())
-        .and_then(logout_handler::quit)
+pub fn router() -> Router {
+    Router::new().route("/logout", get(logout_handler::quit))
 }

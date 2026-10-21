@@ -1,7 +1,6 @@
-
 /// 输出默认分页html
 pub fn default_full(path: &str, count: i64, page: u32, per: u32) -> String {
-    let base_url =  crate::common::get_env("BASE_URL");
+    let base_url = crate::common::get_env("BASE_URL");
     let page_url = format!("{}{}", base_url, path);
 
     let count_page = ((count as f32) / (per as f32)).ceil() as u32; //总页数

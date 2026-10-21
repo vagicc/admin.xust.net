@@ -1,5 +1,5 @@
 // 格式化日志,应该研究下怎么同时把日志写到文件中
- 
+
 struct Padded<T> {
     value: T,
     width: usize,

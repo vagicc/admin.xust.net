@@ -8,9 +8,9 @@ pub type DBPool = Pool<ConnectionManager<PgConnection>>;
 pub type DBConnection = PooledConnection<ConnectionManager<PgConnection>>;
 // pub type DBConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
-/* 
+/*
 2022-06-21 09:21:49 [ERROR] - connection to server at "127.0.0.1", port 5432 failed: Connection refused
-	Is the server running on that host and accepting TCP/IP connections?
+    Is the server running on that host and accepting TCP/IP connections?
 
 thread 'tokio-runtime-worker' panicked at '数据库连接出错: Error(Some("connection to server at \"127.0.0.1\", port 5432 failed: Connection refused\n\tIs the server running on that host and accepting TCP/IP connections?\n"))', src/db.rs:13:24
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

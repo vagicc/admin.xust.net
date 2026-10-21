@@ -184,10 +184,10 @@ pub fn article_list(page: Option<u32>, per: Option<u32>) -> (i64, Vec<Article>, 
 // GET查询条件
 #[derive(Debug, Clone, serde_derive::Deserialize, serde_derive::Serialize)]
 pub struct GetQuery {
-    pub title: Option<String>,   //标题
-    pub columns_id: Option<i32>, //专栏ID，0不属于任何专栏
-    pub category_id: Option<i32>,       //分类ID
-    pub available: Option<i16>,  //阅读权限：0免费、1登录、2私密
+    pub title: Option<String>,    //标题
+    pub columns_id: Option<i32>,  //专栏ID，0不属于任何专栏
+    pub category_id: Option<i32>, //分类ID
+    pub available: Option<i16>,   //阅读权限：0免费、1登录、2私密
 }
 
 /// 取得列表数据
@@ -221,13 +221,13 @@ pub fn list_page(
         }
         // columns_id专栏ID
         if let Some(columnid) = params.columns_id {
-            query=query.filter(columns_id.eq(columnid));
-            query_count=query_count.filter(columns_id.eq(columnid));
+            query = query.filter(columns_id.eq(columnid));
+            query_count = query_count.filter(columns_id.eq(columnid));
         }
 
         if let Some(c_id) = params.columns_id {
-            query=query.filter(category_id.eq(c_id));
-            query_count=query_count.filter(category_id.eq(c_id));
+            query = query.filter(category_id.eq(c_id));
+            query_count = query_count.filter(category_id.eq(c_id));
         }
 
         //阅读权限：0免费、1登录、2私密

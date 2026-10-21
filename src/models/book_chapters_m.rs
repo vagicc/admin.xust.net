@@ -101,7 +101,6 @@ pub fn get_book_all_chapters(bookid: i32) -> Option<Vec<BookChapters>> {
     }
 }
 
-
 // GET查询条件
 #[derive(Debug, Clone, serde_derive::Deserialize, serde_derive::Serialize)]
 pub struct GetQuery {

@@ -45,7 +45,6 @@ impl NewAdmin {
     }
 }
 
-
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct AdminPost {
     pub username: String,
