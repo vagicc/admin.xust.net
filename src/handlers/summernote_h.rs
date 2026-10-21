@@ -4,6 +4,7 @@ use axum::extract::Multipart;
 use axum::http::StatusCode;
 use axum::response::{Html, IntoResponse, Response};
 use axum::Json;
+use rand::Rng;
 use serde_json::value::Map;
 use std::collections::HashMap;
 
@@ -90,7 +91,9 @@ pub async fn upload_summernote(_session: Session, mut form: Multipart) -> Respon
         return upload_error(StatusCode::INTERNAL_SERVER_ERROR, "图片保存失败");
     }
 
-    let filename = format!("{:016x}.{}", rand::random::<u64>(), extension);
+    let timestamp = chrono::Local::now().format("%Y%m%d%H%M%S");
+    let random_suffix = rand::thread_rng().gen_range(0..1000);
+    let filename = format!("{}{:03}.{}", timestamp, random_suffix, extension);
     let path = std::path::Path::new(relative_dir).join(&filename);
     let mut file = match tokio::fs::OpenOptions::new()
         .write(true)
