@@ -85,16 +85,18 @@ pub async fn upload_summernote(_session: Session, mut form: Multipart) -> Respon
         );
     };
 
-    let relative_dir = "static/upload/summernote";
-    if let Err(error) = tokio::fs::create_dir_all(relative_dir).await {
+    let now = chrono::Local::now();
+    let year = now.format("%Y").to_string();
+    let relative_dir = format!("static/upload/summernote/{}", year);
+    if let Err(error) = tokio::fs::create_dir_all(&relative_dir).await {
         log::error!("创建 Summernote 图片目录失败: {}", error);
         return upload_error(StatusCode::INTERNAL_SERVER_ERROR, "图片保存失败");
     }
 
-    let timestamp = chrono::Local::now().format("%Y%m%d%H%M%S");
+    let timestamp = now.format("%Y%m%d%H%M%S");
     let random_suffix = rand::thread_rng().gen_range(0..1000);
     let filename = format!("{}{:03}.{}", timestamp, random_suffix, extension);
-    let path = std::path::Path::new(relative_dir).join(&filename);
+    let path = std::path::Path::new(&relative_dir).join(&filename);
     let mut file = match tokio::fs::OpenOptions::new()
         .write(true)
         .create_new(true)
@@ -114,7 +116,7 @@ pub async fn upload_summernote(_session: Session, mut form: Multipart) -> Respon
 
     Json(serde_json::json!({
         "status": true,
-        "image": format!("/static/upload/summernote/{}", filename)
+        "image": format!("/static/upload/summernote/{}/{}", year, filename)
     }))
     .into_response()
 }
