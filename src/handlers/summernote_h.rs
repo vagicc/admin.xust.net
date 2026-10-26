@@ -6,7 +6,6 @@ use axum::response::{Html, IntoResponse, Response};
 use axum::Json;
 use rand::Rng;
 use serde_json::value::Map;
-use std::collections::HashMap;
 
 pub async fn demo_html(session: Session) -> Response {
     log::info!("输出修改推荐");

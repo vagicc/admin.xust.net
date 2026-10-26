@@ -22,7 +22,7 @@ Discovery（Rust探索微控制器）：https://jzow.github.io/discovery/microbi
    https://jzow.github.io/discovery/microbit/05-led-roulette/flash-it.html
 # 功能開發計劃
 
-# 应该先抓书：“中华典藏” ：https://www.zhonghuadiancang.com/
+# 应该先抓书：“中华典藏” ：https://www.zhonghuadiancang.com/   改为这个网址：https://www.diancang.xyz/
 做已抓取到书的列表，再做点预览，点修改-发布
 章节一章发布
 书籍发布……
@@ -47,7 +47,6 @@ Burn应该为最好的选择，开发官网：https://burn.dev/  公司官网：
 
 秘塔AI搜索： https://metaso.cn/  （比百度好）
 初创AI 
-KimiChat  官网：https://kimi.moonshot.cn/
 
 网站模板：https://www.free-css.com/free-css-templates https://templated.co  https://templatemo.com  https://html5up.net/ https://bootstrapmade.com/
 
